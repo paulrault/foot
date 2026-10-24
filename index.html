@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Football Career : une carrière de football interactive avec des clubs et des matchs fictifs.">
-  <title>Football Career — Matchs interactifs</title>
+  <title>Football Career — Version 8 · Gestion du mercato</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -12,13 +12,13 @@
   <header class="site-header">
     <a class="brand" href="#accueil" aria-label="Football Career accueil"><span class="brand-ball">⚽</span><span>FOOTBALL <b>CAREER</b></span></a>
     <nav aria-label="Navigation principale">
-      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
+      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#coupe">Coupe</a><a href="#international">International</a><a href="#selection">Sélection</a><a href="#entraineur">Mode entraîneur</a><a href="#mercato-club">Mercato club</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
     </nav>
   </header>
 
   <main class="container">
     <section id="accueil" class="hero panel">
-      <div class="hero-copy"><p class="eyebrow">MODE CARRIÈRE · SAISON 1</p><h1>Écris ta propre<br><span>histoire de football.</span></h1><p>Prends tes décisions sur le terrain, gagne ta place et fais progresser ton joueur match après match.</p><a class="button primary" href="#match">Jouer le prochain match ↓</a><p class="fiction-note">Univers de jeu fictif : tous les clubs, joueurs et résultats sont inventés.</p></div>
+      <div class="hero-copy"><p class="eyebrow">MODE CARRIÈRE · SAISON 1 · VERSION 8</p><h1>Écris ta propre<br><span>histoire de football.</span></h1><p>Prends tes décisions sur le terrain, gagne ta place et fais progresser ton joueur match après match.</p><a class="button primary" href="#match">Jouer le prochain match ↓</a><p class="fiction-note">Univers de jeu fictif : tous les clubs, joueurs et résultats sont inventés.</p></div>
       <div class="hero-ball" aria-hidden="true">⚽</div>
     </section>
 
@@ -59,6 +59,88 @@
         <div class="section-heading compact"><div><p class="eyebrow">TON PARCOURS</p><h2>Historique des saisons</h2></div></div>
         <p class="muted">Chaque saison terminée sera ajoutée ici. Ta carrière et tes statistiques restent sauvegardées dans ce navigateur.</p>
         <div id="seasonHistory" class="season-history"><p class="muted">Aucune saison clôturée pour le moment.</p></div>
+      </article>
+    </section>
+
+    <section id="coupe" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">COMPÉTITION À ÉLIMINATION DIRECTE</p><h2>Coupe fictive</h2></div><span class="season-pill" id="cupSeasonPill">Saison 1 · Coupe</span></div>
+      <article class="panel cup-panel">
+        <div class="cup-intro"><div><h3 id="cupStatusTitle">Le tirage au sort est prêt</h3><p id="cupStatusText" class="muted">Huit clubs fictifs s'affrontent pour remporter le trophée. Chaque rencontre se joue en élimination directe.</p></div><div class="cup-trophy" aria-hidden="true">🏆</div></div>
+        <div id="cupBracket" class="cup-bracket" aria-live="polite"></div>
+        <div class="cup-footer"><div><span class="muted">Trophées remportés</span><strong id="cupTitles">0</strong></div><div><span class="muted">Dernier vainqueur</span><strong id="cupLastWinner">—</strong></div><button id="cupPlayNext" class="button primary">Jouer le prochain match de coupe</button></div>
+        <p id="cupMessage" class="feedback" aria-live="polite"></p><div class="cup-history"><h4>Historique des coupes</h4><div id="cupHistoryList"><p class="muted">Aucune coupe terminée pour le moment.</p></div></div>
+      </article>
+    </section>
+
+
+    <section id="international" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">TOURNOI INTERNATIONAL FICTIF</p><h2>Coupe des Nations imaginaires</h2></div><span class="season-pill" id="intlStagePill">Qualifications · Saison 1</span></div>
+      <article class="panel international-panel">
+        <div class="intl-intro"><div><h3 id="intlTitle">La route vers la phase finale commence ici</h3><p id="intlDescription" class="muted">16 sélections fictives, quatre groupes de qualification. Les deux premières de chaque groupe rejoignent les quarts de finale.</p></div><div class="intl-trophy">🌍🏆</div></div>
+        <div class="intl-metrics"><div><span>Phase actuelle</span><strong id="intlStage">Qualifications</strong></div><div><span>Matchs terminés</span><strong id="intlPlayed">0 / 24</strong></div><div><span>Champion</span><strong id="intlChampion">—</strong></div></div>
+        <div id="intlGroups" class="intl-groups"></div>
+        <div id="intlKnockout" class="intl-knockout hidden"></div>
+        <div class="intl-controls"><button id="intlPlayNext" class="button primary">Jouer le prochain match de qualification</button><button id="intlReset" class="button secondary">Recommencer la compétition</button></div>
+        <p id="intlMessage" class="feedback" aria-live="polite"></p>
+        <p class="fiction-note">Compétition autonome de simulation : les sélections, les résultats et le tournoi sont entièrement fictifs et n'affectent pas le championnat du club.</p>
+      </article>
+    </section>
+
+
+    <section id="selection" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">CARRIÈRE INTERNATIONALE</p><h2>Ma sélection nationale</h2></div><span class="season-pill" id="nationalStatus">À observer</span></div>
+      <article class="panel national-panel">
+        <div class="intl-intro"><div><h3 id="nationalHeadline">Représente une nation fictive</h3><p class="muted">Tes performances en club, ta réputation et la confiance du sélectionneur peuvent ouvrir les portes de l'équipe nationale.</p></div><div class="intl-trophy">🌐</div></div>
+        <div class="national-controls">
+          <div><label for="nationalitySelect">Nation choisie</label><select id="nationalitySelect"><option>République d’Aurélia</option><option>Union de Belvar</option><option>Îles de Célestine</option><option>Duché de Dorval</option><option>Fédération d’Estrane</option><option>Royaume de Floréal</option><option>Confédération de Galène</option><option>État d’Helvérie</option></select></div>
+          <button id="requestCallup" class="button primary">Tenter d'obtenir une convocation</button>
+          <button id="playNationalMatch" class="button secondary">Jouer un match international</button>
+        </div>
+        <div class="national-metrics"><div><span>Confiance du coach</span><strong id="coachTrust">60/100</strong><div class="mini-track"><span id="coachTrustBar"></span></div></div><div><span>Sélections</span><strong id="nationalCaps">0</strong></div><div><span>Buts internationaux</span><strong id="nationalGoals">0</strong></div><div><span>Passes décisives</span><strong id="nationalAssists">0</strong></div></div>
+        <div class="national-status-card" id="nationalStatusCard"><strong>Pas encore convoqué</strong><p>Améliore ta réputation en club et réalise de bonnes performances pour attirer l'attention du sélectionneur.</p></div>
+        <p id="nationalMessage" class="feedback" aria-live="polite"></p>
+        <div class="awards-block"><h3>Palmarès et distinctions</h3><div id="awardsList"><p class="muted">Aucune récompense pour le moment. Une très bonne note peut te faire gagner une distinction.</p></div></div>
+        <p class="fiction-note">Toutes les nations, convocations, statistiques et récompenses de cette section sont fictives. Cette sélection est indépendante de la Coupe des Nations imaginaires.</p>
+      </article>
+    </section>
+
+
+    <section id="entraineur" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">NOUVEAU · MODE ENTRAÎNEUR</p><h2>Prends les commandes de ton équipe</h2></div><span class="season-pill">Gestion tactique</span></div>
+      <article class="panel coach-panel">
+        <div class="coach-intro"><div><h3>Prépare le prochain match</h3><p class="muted">Choisis ta formation, ton approche tactique, ton onze et tes changements. Le match sera simulé selon tes choix, la force de l’équipe et les compétences du joueur. Tous les clubs et joueurs restent fictifs.</p></div><div class="coach-icon">📋⚽</div></div>
+        <div class="coach-form-grid">
+          <div class="coach-field"><label for="coachFormation">Formation</label><select id="coachFormation"><option value="4-3-3">4-3-3 · Offensive</option><option value="4-4-2">4-4-2 · Équilibrée</option><option value="3-5-2">3-5-2 · Milieu renforcé</option><option value="5-3-2">5-3-2 · Défensive</option></select></div>
+          <div class="coach-field"><label for="coachMentality">Mentalité</label><select id="coachMentality"><option value="balanced">Équilibrée</option><option value="attack">Offensive</option><option value="defend">Défensive</option></select></div>
+          <div class="coach-field"><label for="coachStyle">Consigne collective</label><select id="coachStyle"><option value="possession">Conserver le ballon</option><option value="pressing">Pressing haut</option><option value="counter">Contre-attaques</option></select></div>
+          <div class="coach-field"><label for="coachPlayerRole">Rôle de ton joueur</label><select id="coachPlayerRole"><option value="starter">Titulaire</option><option value="sub">Remplaçant</option><option value="rest">Au repos</option></select></div>
+          <div class="coach-field"><label for="coachCaptain">Capitaine fictif</label><select id="coachCaptain"><option>Alex Martin</option><option>Lucas Perrin</option><option>Samir Diallo</option><option>Mathis Legrand</option><option>Noé Garnier</option></select></div>
+          <div class="coach-field"><label for="coachSubMinute">Minute du changement</label><select id="coachSubMinute"><option value="55">55e minute</option><option value="65" selected>65e minute</option><option value="75">75e minute</option><option value="80">80e minute</option></select></div>
+        </div>
+        <div class="coach-lineup-wrap"><div><h3>Compose ton onze de départ</h3><p class="muted">Sélectionne un joueur de ton effectif pour chaque poste. Les recrues du mercato sont disponibles ici et leur niveau influence les résultats simulés.</p></div><div id="coachLineup" class="coach-lineup"></div></div>
+        <div class="coach-match-card"><div><p class="eyebrow">PROCHAINE RENCONTRE</p><h3 id="coachFixtureTitle">FC Rivière Bleue — AC Montclair</h3><p id="coachFixtureInfo" class="muted">Journée 1 · Match à préparer</p></div><button id="playCoachMatch" class="button primary">Simuler le match comme entraîneur</button></div>
+        <div id="coachResult" class="coach-result hidden" aria-live="polite"><p class="eyebrow">RAPPORT DU STAFF</p><h3 id="coachResultTitle">Match terminé</h3><div class="coach-result-score" id="coachResultScore">0 — 0</div><p id="coachResultSummary" class="muted"></p><div id="coachResultEvents" class="coach-result-events"></div></div>
+        <p id="coachMessage" class="feedback" aria-live="polite"></p>
+      </article>
+    </section>
+
+
+    <section id="mercato-club" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">NOUVEAU · DIRECTION SPORTIVE</p><h2>Mercato et gestion de l'effectif</h2></div><span class="season-pill">Budget fictif</span></div>
+      <article class="panel manager-market-panel">
+        <div class="coach-intro"><div><h3>Construis ton propre effectif</h3><p class="muted">Recrute des joueurs fictifs, surveille les salaires et vends des joueurs pour financer tes prochaines arrivées. Cette gestion est indépendante du mercato de carrière de ton joueur.</p></div><div class="coach-icon">💶⚽</div></div>
+        <div class="market-finances">
+          <div><span>Budget transferts</span><strong id="clubTransferBudget">8,50 M€</strong></div>
+          <div><span>Masse salariale / semaine</span><strong id="clubWageBill">92 000 €</strong></div>
+          <div><span>Plafond salarial / semaine</span><strong id="clubWageLimit">180 000 €</strong></div>
+          <div><span>Joueurs dans l'effectif</span><strong id="clubSquadCount">16</strong></div>
+        </div>
+        <div class="market-toolbar"><div><h3>Joueurs disponibles</h3><p class="muted">Actualise la liste pour découvrir de nouveaux profils.</p></div><button id="refreshMarketBtn" class="button secondary">Rechercher des joueurs</button></div>
+        <p id="clubMarketMessage" class="feedback" aria-live="polite"></p>
+        <div id="clubMarketCandidates" class="market-player-grid"></div>
+        <div class="market-toolbar squad-toolbar"><div><h3>Mon effectif</h3><p class="muted">Les ventes rapportent une indemnité fictive et libèrent le salaire du joueur.</p></div></div>
+        <div id="clubSquadList" class="market-squad-list"></div>
+        <p class="fiction-note">Tous les joueurs, salaires, valeurs et budgets sont inventés. Les opérations sont enregistrées localement dans ton navigateur.</p>
       </article>
     </section>
 
