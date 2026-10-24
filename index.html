@@ -12,7 +12,7 @@
   <header class="site-header">
     <a class="brand" href="#accueil" aria-label="Football Career accueil"><span class="brand-ball">⚽</span><span>FOOTBALL <b>CAREER</b></span></a>
     <nav aria-label="Navigation principale">
-      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#coupe">Coupe</a><a href="#international">International</a><a href="#selection">Sélection</a><a href="#entraineur">Mode entraîneur</a><a href="#mercato-club">Mercato club</a><a href="#univers-manager">Direction du club</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
+      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#coupe">Coupe</a><a href="#international">International</a><a href="#selection">Sélection</a><a href="#entraineur">Mode entraîneur</a><a href="#mercato-club">Mercato club</a><a href="#univers-manager">Direction du club</a><a href="#monde-vivant">Monde vivant</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
     </nav>
   </header>
 
@@ -176,11 +176,30 @@
       <p class="fiction-note">Tous les clubs, joueurs, divisions, sponsors, transferts, commentaires et résultats sont fictifs. La sauvegarde est locale à ton navigateur.</p>
     </section>
 
+
+    <section id="monde-vivant" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">NOUVEAU · UNIVERS AUTONOME</p><h2>Le monde du football vivant</h2></div><span class="season-pill" id="worldSeason">Saison 1 · Semaine 1</span></div>
+      <article class="panel world-panel">
+        <div class="world-intro"><div><h3>Le football continue, même sans toi</h3><p class="muted">Les clubs fictifs disputent leurs matchs, les joueurs progressent, les entraîneurs peuvent être remplacés et le marché des transferts évolue à chaque semaine simulée.</p></div><div class="world-orb">🌍</div></div>
+        <div class="world-controls"><button id="worldAdvance" class="button primary">⏩ Avancer d'une semaine</button><button id="worldWindow" class="button secondary">🔁 Simuler le mercato</button><button id="worldSeasonEnd" class="button secondary">🏁 Terminer la saison</button></div>
+        <p id="worldMessage" class="feedback" aria-live="polite">Le monde est prêt. Avance une semaine pour lancer les événements.</p>
+        <div class="world-metrics"><div><span>Semaine</span><strong id="worldWeekMetric">1</strong></div><div><span>Matchs simulés</span><strong id="worldMatchesMetric">0</strong></div><div><span>Transferts</span><strong id="worldTransfersMetric">0</strong></div><div><span>Entraîneurs remplacés</span><strong id="worldSacksMetric">0</strong></div></div>
+        <div class="world-columns">
+          <div class="world-subpanel"><h3>🏆 Championnat autonome</h3><p class="muted">Classement du monde vivant, indépendant du calendrier principal.</p><div class="table-scroll"><table><thead><tr><th>#</th><th>Club</th><th>J</th><th>Diff.</th><th>Pts</th></tr></thead><tbody id="worldStandings"></tbody></table></div></div>
+          <div class="world-subpanel"><h3>🗞️ Actualités du monde</h3><p class="muted">Résultats, progressions, changements de coach et mouvements de joueurs.</p><div id="worldNews" class="world-news"></div></div>
+          <div class="world-subpanel"><h3>🔄 Derniers transferts</h3><div id="worldTransfers" class="world-transfers"></div></div>
+          <div class="world-subpanel"><h3>🧑‍💼 Entraîneurs en poste</h3><div id="worldManagers" class="world-managers"></div></div>
+          <div class="world-subpanel world-wide"><h3>⭐ Joueurs à suivre</h3><p class="muted">Les talents peuvent progresser au fil des semaines en fonction de leur potentiel et de leur âge.</p><div id="worldTalents" class="world-talents"></div></div>
+        </div>
+      </article>
+      <p class="fiction-note">Tout cet univers est généré aléatoirement et reste fictif. Les résultats du monde vivant sont séparés des compétitions déjà présentes dans ta carrière.</p>
+    </section>
+
     <section id="calendrier" class="section-block"><div class="section-heading"><div><p class="eyebrow">SAISON FICTIVE</p><h2>Calendrier</h2></div><span class="muted" id="fixtureCount">14 journées</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>Statut</th></tr></thead><tbody id="fixtureTable"></tbody></table></div></article></section>
 
     <section id="classement" class="section-block"><div class="section-heading"><div><p class="eyebrow">OBJECTIF COLLECTIF</p><h2>Classement</h2></div><span class="fiction-note">Ligue fictive</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>#</th><th>Club</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Diff.</th><th>Pts</th></tr></thead><tbody id="standingsTable"></tbody></table></div></article></section>
 
-    <footer><span>⚽ Football Career</span><span>Édition complète V10 · Données fictives · Sauvegarde locale dans ce navigateur</span></footer>
+    <footer><span>⚽ Football Career</span><span>Édition complète V11 · Monde vivant fictif · Données fictives · Sauvegarde locale dans ce navigateur</span></footer>
   </main>
   <dialog id="confirmDialog" class="confirm-dialog"><form method="dialog"><h3>Réinitialiser la carrière ?</h3><p>Ta progression locale sera remplacée par une nouvelle carrière.</p><div class="choice-buttons"><button class="button secondary" value="cancel">Annuler</button><button id="confirmReset" class="button danger" value="confirm">Réinitialiser</button></div></form></dialog>
 </body>
