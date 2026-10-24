@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Football Career : une carrière de football interactive avec des clubs et des matchs fictifs.">
-  <title>Football Career — Version 8 · Gestion du mercato</title>
+  <title>Football Career — Version 10 · Édition complète</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -12,13 +12,13 @@
   <header class="site-header">
     <a class="brand" href="#accueil" aria-label="Football Career accueil"><span class="brand-ball">⚽</span><span>FOOTBALL <b>CAREER</b></span></a>
     <nav aria-label="Navigation principale">
-      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#coupe">Coupe</a><a href="#international">International</a><a href="#selection">Sélection</a><a href="#entraineur">Mode entraîneur</a><a href="#mercato-club">Mercato club</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
+      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#coupe">Coupe</a><a href="#international">International</a><a href="#selection">Sélection</a><a href="#entraineur">Mode entraîneur</a><a href="#mercato-club">Mercato club</a><a href="#univers-manager">Direction du club</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
     </nav>
   </header>
 
   <main class="container">
     <section id="accueil" class="hero panel">
-      <div class="hero-copy"><p class="eyebrow">MODE CARRIÈRE · SAISON 1 · VERSION 8</p><h1>Écris ta propre<br><span>histoire de football.</span></h1><p>Prends tes décisions sur le terrain, gagne ta place et fais progresser ton joueur match après match.</p><a class="button primary" href="#match">Jouer le prochain match ↓</a><p class="fiction-note">Univers de jeu fictif : tous les clubs, joueurs et résultats sont inventés.</p></div>
+      <div class="hero-copy"><p class="eyebrow">MODE CARRIÈRE · SAISON 1 · VERSION 10</p><h1>Écris ta propre<br><span>histoire de football.</span></h1><p>Prends tes décisions sur le terrain, gagne ta place et fais progresser ton joueur match après match.</p><a class="button primary" href="#match">Jouer le prochain match ↓</a><p class="fiction-note">Univers de jeu fictif : tous les clubs, joueurs et résultats sont inventés.</p></div>
       <div class="hero-ball" aria-hidden="true">⚽</div>
     </section>
 
@@ -144,11 +144,43 @@
       </article>
     </section>
 
+
+    <section id="univers-manager" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">ÉDITION COMPLÈTE · NOUVEAUX MODES</p><h2>Direction du club</h2></div><span class="season-pill">V10 · Simulation fictive</span></div>
+      <div class="v10-grid">
+        <article class="panel v10-card"><p class="eyebrow">TACTIQUE AVANCÉE</p><h3>Plan de jeu</h3><p class="muted">Tes consignes donnent un bonus ou un malus de simulation selon le contexte.</p>
+          <div class="v10-field"><label for="v10Pressing">Intensité du pressing</label><select id="v10Pressing"><option value="low">Bloc bas</option><option value="medium" selected>Pressing équilibré</option><option value="high">Pressing intense</option></select></div>
+          <div class="v10-field"><label for="v10Width">Largeur offensive</label><select id="v10Width"><option value="narrow">Jeu axial</option><option value="balanced" selected>Équilibrée</option><option value="wide">Jeu sur les ailes</option></select></div>
+          <div class="v10-field"><label for="v10Defence">Ligne défensive</label><select id="v10Defence"><option value="deep">Basse</option><option value="normal" selected>Médiane</option><option value="high">Haute</option></select></div>
+          <button id="v10SaveTactics" class="button primary full">Enregistrer les consignes</button><p id="v10TacticsMessage" class="feedback" aria-live="polite"></p>
+        </article>
+        <article class="panel v10-card"><p class="eyebrow">CENTRE DE FORMATION</p><h3>Les talents de demain</h3><p class="muted">Génère un jeune joueur fictif puis signe-le dans ton effectif si le budget le permet.</p>
+          <div class="academy-highlight"><span class="academy-ball">🌱</span><div><strong id="academyProspectName">Aucun jeune observé</strong><p id="academyProspectInfo" class="muted">Lance une séance de détection.</p></div></div>
+          <div class="v10-actions"><button id="academyScout" class="button secondary">Observer un jeune</button><button id="academySign" class="button primary" disabled>Intégrer à l'effectif</button></div><p id="academyMessage" class="feedback" aria-live="polite"></p>
+          <div class="v10-metrics"><div><span>Jeunes formés</span><strong id="academyCount">0</strong></div><div><span>Meilleur potentiel</span><strong id="academyPotential">—</strong></div></div>
+        </article>
+        <article class="panel v10-card"><p class="eyebrow">FINANCES DU CLUB</p><h3>Budget et sponsors</h3><p class="muted">Les matchs joués en mode entraîneur génèrent des recettes et des dépenses fictives.</p>
+          <div class="v10-metrics"><div><span>Trésorerie</span><strong id="financeBalance">—</strong></div><div><span>Revenus cumulés</span><strong id="financeIncome">—</strong></div><div><span>Dépenses cumulées</span><strong id="financeExpense">—</strong></div><div><span>Sponsor actif</span><strong id="financeSponsor">—</strong></div></div>
+          <div class="v10-field"><label for="financeSponsorSelect">Contrat sponsor</label><select id="financeSponsorSelect"><option value="local">Partenaire local · +0,25 M€</option><option value="regional">Sponsor régional · +0,65 M€</option><option value="national">Partenaire national · +1,2 M€</option></select></div><button id="financeSponsorBtn" class="button primary full">Signer le sponsor</button><p id="financeMessage" class="feedback" aria-live="polite"></p>
+        </article>
+        <article class="panel v10-card"><p class="eyebrow">PRESSE ET VESTIAIRE</p><h3>Conférence de presse</h3><p id="pressQuestion" class="press-question">Les journalistes attendent ton analyse. Comment abordes-tu le prochain défi ?</p>
+          <div class="v10-field"><label for="pressAnswer">Ta réponse</label><select id="pressAnswer"><option value="confident">« Nous avons confiance en notre projet. »</option><option value="humble">« Nous respectons l'adversaire et restons concentrés. »</option><option value="ambitious">« Nous voulons imposer notre jeu et gagner. »</option><option value="team">« Le collectif passera avant les individualités. »</option></select></div><button id="pressSubmit" class="button primary full">Répondre aux journalistes</button><p id="pressMessage" class="feedback" aria-live="polite"></p><div class="v10-metrics"><div><span>Confiance du vestiaire</span><strong id="pressMorale">65/100</strong></div><div><span>Image médiatique</span><strong id="pressReputation">50/100</strong></div></div>
+        </article>
+        <article class="panel v10-card"><p class="eyebrow">CARRIÈRE D'ENTRAÎNEUR</p><h3>Offres d'emploi</h3><p class="muted">Les résultats, la réputation et la division influencent les clubs intéressés.</p><div id="managerJobOffer" class="job-offer"><strong>Aucune offre reçue</strong><p>Explore le marché des entraîneurs pour découvrir des opportunités fictives.</p></div><div class="v10-actions"><button id="jobSearch" class="button secondary">Chercher un poste</button><button id="jobAccept" class="button primary" disabled>Accepter l'offre</button></div><p id="jobMessage" class="feedback" aria-live="polite"></p><div class="v10-metrics"><div><span>Réputation coach</span><strong id="managerReputation">50/100</strong></div><div><span>Club dirigé</span><strong id="managerClub">FC Rivière Bleue</strong></div></div>
+        </article>
+        <article class="panel v10-card"><p class="eyebrow">PYRAMIDE DES DIVISIONS</p><h3>Montée et relégation</h3><p class="muted">Chaque saison, ton club peut progresser ou reculer selon sa place au classement.</p><div class="division-ladder" id="divisionLadder"></div><div class="v10-metrics"><div><span>Division actuelle</span><strong id="currentDivision">D3</strong></div><div><span>Objectif</span><strong id="divisionObjective">Viser la montée</strong></div></div><button id="divisionResolve" class="button primary full">Évaluer la saison</button><p id="divisionMessage" class="feedback" aria-live="polite"></p>
+        </article>
+        <article class="panel v10-card v10-wide"><p class="eyebrow">STATISTIQUES ET ARCHIVES</p><h3>Tableau de bord historique</h3><div class="v10-metrics stats-metrics"><div><span>Saisons jouées</span><strong id="historySeasons">1</strong></div><div><span>Matchs coach</span><strong id="historyMatches">0</strong></div><div><span>Victoires</span><strong id="historyWins">0</strong></div><div><span>Buts pour</span><strong id="historyGoals">0</strong></div><div><span>Jeunes formés</span><strong id="historyAcademy">0</strong></div><div><span>Trophées</span><strong id="historyTrophies">0</strong></div></div><h4>Journal des événements</h4><div id="v10EventLog" class="event-log"><p class="muted">Les événements importants apparaîtront ici.</p></div><button id="v10Export" class="button secondary">Exporter la sauvegarde JSON</button><p id="v10ExportMessage" class="feedback" aria-live="polite"></p>
+        </article>
+      </div>
+      <p class="fiction-note">Tous les clubs, joueurs, divisions, sponsors, transferts, commentaires et résultats sont fictifs. La sauvegarde est locale à ton navigateur.</p>
+    </section>
+
     <section id="calendrier" class="section-block"><div class="section-heading"><div><p class="eyebrow">SAISON FICTIVE</p><h2>Calendrier</h2></div><span class="muted" id="fixtureCount">14 journées</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>Statut</th></tr></thead><tbody id="fixtureTable"></tbody></table></div></article></section>
 
     <section id="classement" class="section-block"><div class="section-heading"><div><p class="eyebrow">OBJECTIF COLLECTIF</p><h2>Classement</h2></div><span class="fiction-note">Ligue fictive</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>#</th><th>Club</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Diff.</th><th>Pts</th></tr></thead><tbody id="standingsTable"></tbody></table></div></article></section>
 
-    <footer><span>⚽ Football Career</span><span>Prototype de jeu · Données fictives · Sauvegarde locale dans ce navigateur</span></footer>
+    <footer><span>⚽ Football Career</span><span>Édition complète V10 · Données fictives · Sauvegarde locale dans ce navigateur</span></footer>
   </main>
   <dialog id="confirmDialog" class="confirm-dialog"><form method="dialog"><h3>Réinitialiser la carrière ?</h3><p>Ta progression locale sera remplacée par une nouvelle carrière.</p><div class="choice-buttons"><button class="button secondary" value="cancel">Annuler</button><button id="confirmReset" class="button danger" value="confirm">Réinitialiser</button></div></form></dialog>
 </body>
