@@ -4,341 +4,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Suivez l'histoire et l'évolution d'un jeune joueur de football.">
-    <title>Ma carrière de footballeur</title>
+    <meta name="description" content="Découvre et fais évoluer la carrière de Lucas Morel, jeune footballeur fictif.">
+    <title>Football Career | Lucas Morel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
-
 <body>
 
-    <header>
-        <h1>⚽ Ma carrière de footballeur</h1>
-        <p>Une histoire, une passion, un rêve.</p>
+<header class="topbar">
+    <a class="logo" href="#accueil">FC <span>CAREER</span></a>
+    <nav>
+        <a href="#accueil">Accueil</a>
+        <a href="#profil">Joueur</a>
+        <a href="#carriere">Carrière</a>
+        <a href="#statistiques">Statistiques</a>
+    </nav>
+</header>
 
-        <nav>
-            <a href="#accueil">Accueil</a> |
-            <a href="#joueur">Mon joueur</a> |
-            <a href="#histoire">Mon histoire</a> |
-            <a href="#matchs">Les matchs</a> |
-            <a href="#statistiques">Statistiques</a> |
-            <a href="#objectifs">Mes objectifs</a> |
-            <a href="#journal">Journal de carrière</a>
-        </nav>
-        <hr>
-    </header>
+<main class="container">
 
-    <main>
-
-        <section id="accueil">
-            <h2>Bienvenue dans mon aventure !</h2>
-
+    <section class="hero" id="accueil">
+        <div class="hero-content">
+            <span class="eyebrow">MODE CARRIÈRE · SAISON 2026/2027</span>
+            <h1>Chaque match<br>écrit une histoire.</h1>
             <p>
-                Découvrez le parcours d'un jeune footballeur qui rêve
-                de progresser et de gravir les échelons du football.
+                Prends les décisions, progresse sur le terrain
+                et construis la carrière de ton joueur.
             </p>
+            <a class="button" href="#carriere">Continuer l'aventure →</a>
+        </div>
+        <div class="hero-number">09</div>
+    </section>
 
-            <p>
-                Chaque match, chaque entraînement et chaque décision
-                peuvent changer le cours de sa carrière.
-            </p>
+    <section class="section" id="profil">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">TON JOUEUR</span>
+                <h2>Profil du joueur</h2>
+            </div>
+            <span class="status">● Carrière en cours</span>
+        </div>
 
-            <h3>Dernière actualité</h3>
-            <p>
-                Saison 2026-2027 : Lucas commence une nouvelle aventure
-                et veut gagner sa place dans son équipe.
-            </p>
-        </section>
+        <div class="player-card">
+            <div class="player-number">09</div>
+            <div class="player-info">
+                <span class="eyebrow">ATTAQUANT · FRANCE</span>
+                <h2 id="player-name">Lucas Morel</h2>
+                <p>FC des Horizons <span class="fictional">(club fictif)</span></p>
+                <div class="player-details">
+                    <div>
+                        <span>Âge</span>
+                        <strong id="age">16 ans</strong>
+                    </div>
+                    <div>
+                        <span>Saison</span>
+                        <strong>2026/2027</strong>
+                    </div>
+                    <div>
+                        <span>Numéro</span>
+                        <strong>09</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="overall">
+                <span>NOTE</span>
+                <strong id="overall">55</strong>
+                <span>/ 100</span>
+            </div>
+        </div>
+    </section>
 
-        <hr>
+    <section class="section" id="statistiques">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">BILAN SPORTIF</span>
+                <h2>Statistiques de la saison</h2>
+            </div>
+        </div>
 
-        <section id="joueur">
-            <h2>👤 Fiche du joueur</h2>
+        <div class="stats-grid">
+            <article class="stat-card">
+                <span>Matchs joués</span>
+                <strong id="matches">0</strong>
+            </article>
+            <article class="stat-card">
+                <span>Buts</span>
+                <strong id="goals">0</strong>
+            </article>
+            <article class="stat-card">
+                <span>Passes décisives</span>
+                <strong id="assists">0</strong>
+            </article>
+            <article class="stat-card">
+                <span>Confiance</span>
+                <strong id="confidence">50</strong>
+                <div class="progress">
+                    <div id="confidence-bar" class="progress-fill"></div>
+                </div>
+            </article>
+        </div>
+    </section>
 
-            <h3>Lucas Morel</h3>
+    <section class="section" id="carriere">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">À TOI DE JOUER</span>
+                <h2>Gérer ma carrière</h2>
+            </div>
+        </div>
 
-            <ul>
-                <li>Âge : 16 ans</li>
-                <li>Nationalité : française</li>
-                <li>Poste : attaquant</li>
-                <li>Numéro : 9</li>
-                <li>Club : FC des Horizons (club fictif)</li>
-                <li>Division : championnat départemental fictif</li>
-                <li>Pied préféré : droit</li>
-                <li>Objectif : devenir un joueur de haut niveau</li>
-            </ul>
-
-            <h3>Profil sportif</h3>
-
-            <p>
-                Lucas est un jeune attaquant dynamique.
-                Il aime prendre la profondeur, participer au jeu
-                collectif et tenter sa chance devant le but.
-            </p>
-
-            <p>
-                Ses points forts sont sa vitesse et sa détermination.
-                Il doit encore progresser dans ses choix de jeu
-                et sa régularité.
-            </p>
-        </section>
-
-        <hr>
-
-        <section id="histoire">
-            <h2>📖 L'histoire de Lucas</h2>
-
-            <article>
-                <h3>Chapitre 1 : Un rêve qui commence</h3>
-
+        <div class="career-grid">
+            <article class="panel">
+                <h3>🏋️ Entraînement</h3>
                 <p>
-                    Lucas a toujours aimé le football.
-                    Depuis son enfance, il joue avec ses amis
-                    et regarde les grands matchs avec admiration.
+                    Choisis une séance pour améliorer ton joueur.
+                    Chaque séance consomme de l'énergie.
                 </p>
 
-                <p>
-                    À 16 ans, il rejoint le FC des Horizons.
-                    Il sait qu'il devra travailler dur pour convaincre
-                    son entraîneur et gagner du temps de jeu.
-                </p>
+                <div class="energy-info">
+                    <span>Énergie disponible</span>
+                    <strong id="energy">100 / 100</strong>
+                </div>
+                <div class="progress">
+                    <div id="energy-bar" class="progress-fill"></div>
+                </div>
 
-                <p>
-                    Son premier objectif est simple :
-                    intégrer régulièrement le groupe et aider
-                    son équipe à obtenir de bons résultats.
-                </p>
+                <button class="action-button" data-action="shooting">
+                    Travailler la finition <span>−25 énergie</span>
+                </button>
+                <button class="action-button" data-action="physical">
+                    Travailler le physique <span>−30 énergie</span>
+                </button>
+                <button class="action-button" data-action="rest">
+                    Se reposer <span>Récupération</span>
+                </button>
             </article>
 
-            <article>
-                <h3>Chapitre 2 : Les premiers défis</h3>
-
-                <p>
-                    Les premiers entraînements sont exigeants.
-                    Lucas découvre un niveau plus difficile et doit
-                    apprendre à jouer plus rapidement.
-                </p>
-
-                <p>
-                    Malgré quelques erreurs, il reste motivé.
-                    Il décide de travailler sa finition, ses passes
-                    et son placement.
-                </p>
-
-                <p>
-                    La suite de cette histoire dépendra des prochains
-                    matchs et de son évolution au fil de la saison.
-                </p>
+            <article class="panel">
+                <h3>⚽ Prochain match</h3>
+                <span class="tag">CHAMPIONNAT FICTIF</span>
+                <div class="match">
+                    <div class="team">
+                        <div class="team-badge">FC</div>
+                        <strong>Horizons</strong>
+                    </div>
+                    <span class="versus">VS</span>
+                    <div class="team">
+                        <div class="team-badge opponent">AS</div>
+                        <strong>Collines</strong>
+                    </div>
+                </div>
+                <p>Objectif : aider ton équipe à obtenir un résultat positif.</p>
+                <button class="button full-width" id="play-match">
+                    Jouer le match
+                </button>
+                <p class="small-note">La rencontre est simulée par le jeu.</p>
             </article>
-        </section>
+        </div>
+    </section>
 
-        <hr>
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">LE FIL DE TON AVENTURE</span>
+                <h2>Journal de carrière</h2>
+            </div>
+        </div>
+        <div class="panel">
+            <div id="story">
+                <article class="story-entry">
+                    <span class="story-date">DÉBUT DE CARRIÈRE</span>
+                    <h3>Un rêve à construire</h3>
+                    <p>
+                        Lucas rejoint le FC des Horizons à 16 ans.
+                        Il veut progresser, gagner la confiance de
+                        son entraîneur et aider ses coéquipiers.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
 
-        <section id="matchs">
-            <h2>📅 Résultats des matchs</h2>
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">TES DÉCISIONS</span>
+                <h2>Quel sera ton prochain choix ?</h2>
+            </div>
+        </div>
 
+        <div class="choices">
+            <button class="choice-card" data-choice="team">
+                <span>🤝</span>
+                <strong>Jouer collectif</strong>
+                <p>Privilégier les passes et l'esprit d'équipe.</p>
+            </button>
+            <button class="choice-card" data-choice="ambition">
+                <span>🎯</span>
+                <strong>Viser plus haut</strong>
+                <p>Se fixer des objectifs sportifs ambitieux.</p>
+            </button>
+            <button class="choice-card" data-choice="coach">
+                <span>💬</span>
+                <strong>Écouter le coach</strong>
+                <p>Travailler sérieusement pour progresser.</p>
+            </button>
+        </div>
+        <p id="choice-feedback" class="feedback" aria-live="polite">
+            Choisis une option pour influencer ton histoire.
+        </p>
+    </section>
+
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">SAUVEGARDE</span>
+                <h2>Ma progression</h2>
+            </div>
+        </div>
+        <div class="panel save-panel">
             <p>
-                Les rencontres ci-dessous sont fictives et servent
-                d'exemple pour construire le site.
+                Sauvegarde ta carrière dans ce navigateur pour
+                retrouver tes statistiques lors de ta prochaine visite.
             </p>
+            <div class="save-actions">
+                <button class="button" id="save-game">Sauvegarder</button>
+                <button class="action-button" id="load-game">Charger</button>
+                <button class="action-button" id="reset-game">Nouvelle carrière</button>
+            </div>
+            <p id="save-feedback" class="small-note" aria-live="polite"></p>
+        </div>
+    </section>
 
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Rencontre</th>
-                        <th>Résultat</th>
-                        <th>Temps de jeu de Lucas</th>
-                        <th>Buts</th>
-                        <th>Passes décisives</th>
-                    </tr>
-                </thead>
+</main>
 
-                <tbody>
-                    <tr>
-                        <td>06/09/2026</td>
-                        <td>FC des Horizons - FC de la Vallée</td>
-                        <td>2 - 1</td>
-                        <td>25 minutes</td>
-                        <td>0</td>
-                        <td>0</td>
-                    </tr>
-
-                    <tr>
-                        <td>13/09/2026</td>
-                        <td>AS des Collines - FC des Horizons</td>
-                        <td>1 - 1</td>
-                        <td>45 minutes</td>
-                        <td>1</td>
-                        <td>0</td>
-                    </tr>
-
-                    <tr>
-                        <td>20/09/2026</td>
-                        <td>FC des Horizons - ES du Littoral</td>
-                        <td>3 - 2</td>
-                        <td>60 minutes</td>
-                        <td>1</td>
-                        <td>1</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <section id="statistiques">
-            <h2>📊 Statistiques de la saison</h2>
-
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Statistique</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>Matchs disputés</td>
-                        <td>3</td>
-                    </tr>
-
-                    <tr>
-                        <td>Matchs comme titulaire</td>
-                        <td>0</td>
-                    </tr>
-
-                    <tr>
-                        <td>Buts marqués</td>
-                        <td>2</td>
-                    </tr>
-
-                    <tr>
-                        <td>Passes décisives</td>
-                        <td>1</td>
-                    </tr>
-
-                    <tr>
-                        <td>Minutes jouées</td>
-                        <td>130</td>
-                    </tr>
-
-                    <tr>
-                        <td>Cartons jaunes</td>
-                        <td>0</td>
-                    </tr>
-
-                    <tr>
-                        <td>Cartons rouges</td>
-                        <td>0</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <section id="objectifs">
-            <h2>🎯 Les objectifs de Lucas</h2>
-
-            <h3>Objectifs individuels</h3>
-
-            <ul>
-                <li>Gagner une place de titulaire.</li>
-                <li>Améliorer sa finition devant le but.</li>
-                <li>Marquer au moins 10 buts dans la saison.</li>
-                <li>Améliorer son jeu collectif.</li>
-            </ul>
-
-            <h3>Objectifs collectifs</h3>
-
-            <ul>
-                <li>Aider son équipe à gagner des matchs.</li>
-                <li>Progresser avec ses coéquipiers.</li>
-                <li>Respecter ses adversaires et les arbitres.</li>
-                <li>Prendre du plaisir à jouer au football.</li>
-            </ul>
-        </section>
-
-        <hr>
-
-        <section id="journal">
-            <h2>📝 Journal de carrière</h2>
-
-            <article>
-                <h3>20 septembre 2026 - Une première étape</h3>
-
-                <p>
-                    Lucas a participé à son troisième match.
-                    Il a marqué un but et délivré une passe décisive.
-                    Son entraîneur l'encourage à poursuivre ses efforts.
-                </p>
-            </article>
-
-            <article>
-                <h3>Prochain épisode : gagner sa place</h3>
-
-                <p>
-                    Lucas devra continuer à travailler pour espérer
-                    débuter une prochaine rencontre.
-                    Les prochaines semaines seront importantes.
-                </p>
-            </article>
-        </section>
-
-        <hr>
-
-        <section id="transferts">
-            <h2>🔄 Historique des clubs</h2>
-
-            <ol>
-                <li>
-                    2026-2027 : FC des Horizons
-                    (premier club de l'histoire)
-                </li>
-            </ol>
-
-            <p>
-                Les prochains clubs seront ajoutés au fur et à mesure
-                de l'évolution de la carrière.
-            </p>
-        </section>
-
-        <hr>
-
-        <section id="saisons">
-            <h2>🏆 Historique des saisons</h2>
-
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Saison</th>
-                        <th>Club</th>
-                        <th>Matchs</th>
-                        <th>Buts</th>
-                        <th>Passes décisives</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>2026-2027</td>
-                        <td>FC des Horizons</td>
-                        <td>3</td>
-                        <td>2</td>
-                        <td>1</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-    </main>
-
-    <footer>
-        <hr>
-        <p>Ma carrière de footballeur - Projet fictif</p>
-        <p>Site créé avec HTML et hébergé sur GitHub Pages.</p>
-        <p>Dernière mise à jour : 20 septembre 2026.</p>
-    </footer>
+<footer>
+    <p>FC CAREER · Une carrière fictive à écrire.</p>
+    <p>Projet personnel réalisé avec HTML, CSS et JavaScript.</p>
+</footer>
 
 </body>
 </html>
