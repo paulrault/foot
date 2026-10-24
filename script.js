@@ -5,7 +5,7 @@ const TEAM_NAMES = ['FC Rivière Bleue','AC Montclair','Olympique des Pins','Sta
 const DEFAULT_STATE = () => ({
   player:{name:'Alex Martin',position:'Attaquant',number:9,club:'FC Rivière Bleue',shooting:55,physical:55,teamwork:55},
   season:1, currentFixture:0, stats:{apps:0,starts:0,goals:0,assists:0,minutes:0,ratings:[],actions:0},
-  fixtures:[], standings:[], lastMatch:null, objectiveMatches:0
+  fixtures:[], standings:[], lastMatch:null, objectiveMatches:0, reputation:50, transferOffer:null, transferHistory:[], seasonHistory:[]
 });
 let state = loadState();
 let live = null;
@@ -58,11 +58,16 @@ function updatePlayerUI(){
   $('objectiveProgress').textContent=`${state.objectiveMatches} / 5 matchs joués`; $('objectiveBar').style.width=Math.min(100,state.objectiveMatches/5*100)+'%';
   $('objectiveTitle').textContent=state.objectiveMatches>=5?'Objectif atteint !':'Gagner ta place';
   $('objectiveText').textContent=state.objectiveMatches>=5?'Tu as participé à cinq rencontres. Continue à progresser pour devenir un joueur incontournable.':'Participe à cinq rencontres pour atteindre ton premier objectif de carrière.';
+  $('seasonPill').textContent=`Saison ${state.season} · Fiction`;
+  $('reputationValue').textContent=`${state.reputation}/100`;
+  $('marketValue').textContent=`${Math.round((getOverall()*getOverall()*0.04)+20)} k€`;
+  $('nextSeasonBtn').classList.toggle('hidden',!!getFixture());
+  renderTransferOffer(); renderSeasonHistory();
 }
 function updatePreMatch(){
   const f=getFixture();
   $('preMatch').classList.remove('hidden'); $('liveMatch').classList.add('hidden'); $('postMatch').classList.add('hidden');
-  if(!f){$('matchStatus').textContent='Saison terminée';$('matchRound').textContent='Fin de saison';$('homeTeam').textContent=state.player.club;$('awayTeam').textContent='Fin de saison';$('opponentInfo').textContent='Toutes les journées sont terminées. Réinitialise la carrière pour recommencer.';$('startStarter').disabled=true;$('startSub').disabled=true;return;}
+  if(!f){$('matchStatus').textContent='Saison terminée';$('matchRound').textContent='Fin de saison';$('homeTeam').textContent=state.player.club;$('awayTeam').textContent='Saison terminée';$('opponentInfo').textContent='Toutes les journées sont terminées. Consulte le classement puis clôture la saison pour continuer ta carrière.';$('startStarter').disabled=true;$('startSub').disabled=true;$('nextSeasonBtn').classList.remove('hidden');return;}
   $('startStarter').disabled=false;$('startSub').disabled=false;
   $('matchStatus').textContent='À préparer'; $('matchRound').textContent=`Journée ${f.round}`; $('homeTeam').textContent=f.home; $('awayTeam').textContent=f.away;
   const isHome=f.homeId===0; $('matchVenue').textContent=isHome?'À domicile':'À l’extérieur'; $('kickoff').textContent='Coup d’envoi à venir';
@@ -78,7 +83,44 @@ function renderStandings(){
   const rows=state.standings.map(t=>({...t,name:t.id===0?state.player.club:t.name})).sort((a,b)=>b.points-a.points||(b.for-b.against)-(a.for-a.against)||b.for-a.for||a.name.localeCompare(b.name));
   $('standingsTable').innerHTML=''; rows.forEach((t,i)=>{const tr=document.createElement('tr');if(t.id===0)tr.classList.add('current-team');tr.innerHTML=`<td>${i+1}</td><td class="team-cell">${escapeHTML(t.name)}${t.id===0?' <span class="muted">(toi)</span>':''}</td><td>${t.played}</td><td>${t.wins}</td><td>${t.draws}</td><td>${t.losses}</td><td>${t.for-t.against>0?'+':''}${t.for-t.against}</td><td><b>${t.points}</b></td>`;$('standingsTable').appendChild(tr);});
 }
-function renderAll(){refreshTeamNames();updatePlayerUI();updatePreMatch();renderFixtures();renderStandings();}
+function renderAll(){refreshTeamNames();updatePlayerUI();updatePreMatch();renderFixtures();renderStandings();renderTransferOffer();renderSeasonHistory();}
+function renderTransferOffer(){
+  const box=$('transferOffer'); if(!box)return; const offer=state.transferOffer;
+  if(!offer){box.innerHTML='<h3>Aucune offre pour le moment</h3><p class="muted">Tu peux demander à ton agent de sonder le marché.</p>';$('acceptOfferBtn').classList.add('hidden');$('declineOfferBtn').classList.add('hidden');return;}
+  box.innerHTML=`<p class="eyebrow">OFFRE REÇUE</p><h3>${escapeHTML(offer.club)}</h3><p>Rôle proposé : <strong>${escapeHTML(offer.role)}</strong></p><p>Indemnité fictive : <strong>${offer.fee} k€</strong></p><p class="muted">Note générale minimale souhaitée : ${offer.requiredOverall}. ${getOverall()>=offer.requiredOverall?'Ton profil correspond aux attentes.':'Le club prend un risque en te recrutant.'}</p>`;
+  $('acceptOfferBtn').classList.remove('hidden');$('declineOfferBtn').classList.remove('hidden');
+}
+function renderSeasonHistory(){
+  const box=$('seasonHistory'); if(!box)return;
+  if(!state.seasonHistory.length){box.innerHTML='<p class="muted">Aucune saison clôturée pour le moment.</p>';return;}
+  box.innerHTML=state.seasonHistory.slice().reverse().map(item=>`<div class="history-item"><strong>Saison ${item.season} · ${escapeHTML(item.club)}</strong><span>Classement : ${item.position}e / ${TEAM_NAMES.length}</span><span>Champion : ${escapeHTML(item.champion)}</span><span>Bilan personnel : ${item.goals} but(s), ${item.assists} passe(s) décisive(s) en carrière</span></div>`).join('');
+}
+function generateTransferOffer(){
+  if(live){$('transferMessage').textContent='Termine le match avant de rechercher un transfert.';return;}
+  if(!getFixture()){$('transferMessage').textContent='Clôture la saison avant de négocier une nouvelle offre.';return;}
+  const options=TEAM_NAMES.filter((name,id)=>id!==0&&name!==state.player.club);
+  const club=options[random(options.length)]||'FC Nouvelle-Aube';
+  const overall=getOverall(); const requiredOverall=clamp(45+random(30),45,74);
+  const fee=Math.max(20,Math.round(overall*overall*(0.025+Math.random()*0.025)));
+  const roles=['Rotation de l’effectif','Joueur important','Projet de titulaire','Renfort offensif'];
+  state.transferOffer={club,requiredOverall,fee,role:roles[random(roles.length)]};
+  $('transferMessage').textContent=`Ton agent a obtenu une proposition du ${club}.`;renderTransferOffer();saveState();
+}
+function acceptTransfer(){
+  const offer=state.transferOffer;if(!offer)return;
+  const previous=state.player.club;state.transferHistory.push({from:previous,to:offer.club,season:state.season,fee:offer.fee});
+  state.player.club=offer.club;state.reputation=clamp(state.reputation+3,0,100);state.transferOffer=null;refreshTeamNames();renderAll();saveState();
+  $('transferMessage').textContent=`Transfert confirmé ! Tu rejoins ${state.player.club}. Les résultats déjà joués restent inchangés.`;
+}
+function declineTransfer(){if(!state.transferOffer)return;const club=state.transferOffer.club;state.transferOffer=null;renderTransferOffer();saveState();$('transferMessage').textContent=`Tu as refusé l'offre de ${club} et tu restes dans ton club.`;}
+function closeSeason(){
+  if(getFixture())return;
+  const ordered=state.standings.slice().sort((a,b)=>b.points-a.points||(b.for-b.against)-(a.for-a.against)||b.for-a.for);
+  const position=Math.max(1,ordered.findIndex(t=>t.id===0)+1);
+  state.seasonHistory.push({season:state.season,club:state.player.club,position,champion:ordered[0]?.name||'Champion fictif',goals:state.stats.goals,assists:state.stats.assists,apps:state.stats.apps});
+  state.season++;state.fixtures=createFixtures();state.standings=TEAM_NAMES.map((name,id)=>({id,name:id===0?state.player.club:name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0}));state.transferOffer=null;state.reputation=clamp(state.reputation+2,0,100);
+  refreshTeamNames();renderAll();saveState();$('trainingMessage').textContent=`La saison ${state.season-1} est archivée. Bienvenue dans la saison ${state.season} !`;$('match').scrollIntoView({behavior:'smooth'});
+}
 function escapeHTML(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function beginMatch(asStarter){
   if(live)return; const f=getFixture(); if(!f)return;
@@ -143,7 +185,7 @@ function endMatch(){
   const f=live.fixture;f.played=true;f.homeGoals=live.homeGoals;f.awayGoals=live.awayGoals;
   const playerPlayed=live.entered&&live.minutes>0;
   if(playerPlayed){state.stats.apps++;state.stats.minutes+=live.minutes;state.stats.ratings.push(Number(live.rating.toFixed(1)));state.objectiveMatches++;if(live.asStarter)state.stats.starts++;}
-  updateStandings(f);state.lastMatch={round:f.round,home:f.home,away:f.away,homeGoals:f.homeGoals,awayGoals:f.awayGoals,minutes:live.minutes,rating:live.rating,goals:live.goals,assists:live.assists};
+  updateStandings(f);if(playerPlayed){state.reputation=clamp(state.reputation+Math.round((live.rating-6)*2)+(live.goals?2:0)+(live.assists?1:0),0,100);}state.lastMatch={round:f.round,home:f.home,away:f.away,homeGoals:f.homeGoals,awayGoals:f.awayGoals,minutes:live.minutes,rating:live.rating,goals:live.goals,assists:live.assists};
   saveState();$('matchStatus').textContent='Terminé';$('liveMatch').classList.add('hidden');$('preMatch').classList.add('hidden');$('postMatch').classList.remove('hidden');
   const playerGoals=live.goals;let headline=f.homeGoals>f.awayGoals?`${f.home} remporte le match !`:f.homeGoals<f.awayGoals?`${f.away} remporte le match !`:'Match nul';$('finalHeadline').textContent=headline;$('finalHomeScore').textContent=f.homeGoals;$('finalAwayScore').textContent=f.awayGoals;
   $('finalSummary').textContent=playerPlayed?`${state.player.name} a joué ${live.minutes} minutes et termine avec une note de ${live.rating.toFixed(1)}/10.`:`Tu n’es pas entré en jeu lors de cette rencontre.`;
@@ -160,8 +202,13 @@ function train(type){if(live){$('trainingMessage').textContent='Termine le match
 function saveProfile(){state.player.name=$('playerName').value.trim()||'Alex Martin';state.player.position=$('playerPosition').value;state.player.number=clamp(Number($('playerNumber').value)||9,1,99);state.player.club=$('clubName').value.trim()||'FC Rivière Bleue';refreshTeamNames();renderAll();saveState();$('trainingMessage').textContent='Profil enregistré.';}
 function resetGame(){state=DEFAULT_STATE();state.fixtures=createFixtures();state.standings=TEAM_NAMES.map((name,id)=>({id,name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0}));live=null;pendingResult=null;saveState();renderAll();$('confirmDialog').close();$('trainingMessage').textContent='Nouvelle carrière créée.';}
 
-$('startStarter').addEventListener('click',()=>beginMatch(true));$('startSub').addEventListener('click',()=>beginMatch(false));$('advanceMatch').addEventListener('click',advanceTime);$('substituteMe').addEventListener('click',askToBeSubbed);document.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>takeAction(btn.dataset.action)));document.querySelectorAll('[data-training]').forEach(btn=>btn.addEventListener('click',()=>train(btn.dataset.training)));$('saveProfileBtn').addEventListener('click',saveProfile);$('finishMatch').addEventListener('click',()=>{live=null;renderAll();saveState();$('match').scrollIntoView({behavior:'smooth'});});$('resetGame').addEventListener('click',()=>{if(typeof $('confirmDialog').showModal==='function')$('confirmDialog').showModal();else if(confirm('Réinitialiser la carrière ?'))resetGame();});$('confirmReset').addEventListener('click',event=>{event.preventDefault();resetGame();});
+$('startStarter').addEventListener('click',()=>beginMatch(true));$('startSub').addEventListener('click',()=>beginMatch(false));$('advanceMatch').addEventListener('click',advanceTime);$('substituteMe').addEventListener('click',askToBeSubbed);document.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>takeAction(btn.dataset.action)));document.querySelectorAll('[data-training]').forEach(btn=>btn.addEventListener('click',()=>train(btn.dataset.training)));$('saveProfileBtn').addEventListener('click',saveProfile);$('generateOfferBtn').addEventListener('click',generateTransferOffer);$('acceptOfferBtn').addEventListener('click',acceptTransfer);$('declineOfferBtn').addEventListener('click',declineTransfer);$('nextSeasonBtn').addEventListener('click',closeSeason);$('finishMatch').addEventListener('click',()=>{live=null;renderAll();saveState();$('match').scrollIntoView({behavior:'smooth'});});$('resetGame').addEventListener('click',()=>{if(typeof $('confirmDialog').showModal==='function')$('confirmDialog').showModal();else if(confirm('Réinitialiser la carrière ?'))resetGame();});$('confirmReset').addEventListener('click',event=>{event.preventDefault();resetGame();});
 
+// Migration des sauvegardes V2 vers V3.
+if(typeof state.reputation!=='number')state.reputation=50;
+if(!Array.isArray(state.transferHistory))state.transferHistory=[];
+if(!Array.isArray(state.seasonHistory))state.seasonHistory=[];
+if(!('transferOffer' in state))state.transferOffer=null;
 // Support older saves from the previous prototype: add any missing league data safely.
 if(!state.fixtures.length)state.fixtures=createFixtures();
 if(!state.standings.length)state.standings=TEAM_NAMES.map((name,id)=>({id,name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0}));

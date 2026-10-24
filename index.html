@@ -12,7 +12,7 @@
   <header class="site-header">
     <a class="brand" href="#accueil" aria-label="Football Career accueil"><span class="brand-ball">⚽</span><span>FOOTBALL <b>CAREER</b></span></a>
     <nav aria-label="Navigation principale">
-      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
+      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#transferts">Transferts</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
     </nav>
   </header>
 
@@ -23,7 +23,7 @@
     </section>
 
     <section id="carriere" class="section-block">
-      <div class="section-heading"><div><p class="eyebrow">TON PROFIL</p><h2>Ma carrière</h2></div><span class="season-pill">Saison 1 · Fiction</span></div>
+      <div class="section-heading"><div><p class="eyebrow">TON PROFIL</p><h2>Ma carrière</h2></div><span class="season-pill" id="seasonPill">Saison 1 · Fiction</span></div>
       <div class="profile-grid">
         <article class="panel player-card"><div class="avatar">⚽</div><div class="player-details"><label for="playerName">Nom du joueur</label><input id="playerName" maxlength="28" value="Alex Martin"><div class="profile-fields"><div><label for="playerPosition">Poste</label><select id="playerPosition"><option>Attaquant</option><option>Milieu</option><option>Ailier</option><option>Défenseur</option></select></div><div><label for="playerNumber">Numéro</label><input id="playerNumber" type="number" min="1" max="99" value="9"></div></div><label for="clubName">Club actuel (fictif)</label><input id="clubName" maxlength="35" value="FC Rivière Bleue"></div><button id="saveProfileBtn" class="button secondary full">Enregistrer le profil</button></article>
         <article class="panel rating-card"><p class="eyebrow">NOTE GÉNÉRALE</p><div class="overall" id="overall">55</div><div class="rating-track"><span id="overallBar"></span></div><p id="playerStatus" class="muted">Jeune espoir · prêt à faire ses preuves</p><div class="skill-list"><div class="skill"><span>Finition</span><div class="skill-track"><span id="shootingBar"></span></div><b id="shootingValue">55</b></div><div class="skill"><span>Physique</span><div class="skill-track"><span id="physicalBar"></span></div><b id="physicalValue">55</b></div><div class="skill"><span>Collectif</span><div class="skill-track"><span id="teamworkBar"></span></div><b id="teamworkValue">55</b></div></div></article>
@@ -42,7 +42,24 @@
 
     <section class="section-block two-columns">
       <article class="panel training-panel"><div class="section-heading compact"><div><p class="eyebrow">PROGRESSION</p><h2>Entraînement</h2></div></div><p class="muted">Un entraînement améliore une compétence. Le repos réduit la fatigue entre les matchs.</p><div class="training-buttons"><button class="button secondary" data-training="shooting">⚽ Finition</button><button class="button secondary" data-training="physical">💪 Physique</button><button class="button secondary" data-training="teamwork">🤝 Collectif</button><button class="button secondary" data-training="rest">☕ Repos</button></div><p id="trainingMessage" class="feedback" aria-live="polite"></p></article>
-      <article class="panel next-panel"><p class="eyebrow">PROCHAIN OBJECTIF</p><h2 id="objectiveTitle">Gagner ta place</h2><p id="objectiveText" class="muted">Participe au prochain match et réalise de bonnes actions pour progresser.</p><div class="objective-track"><span id="objectiveBar"></span></div><small id="objectiveProgress">0 / 1 match joué</small><button id="resetGame" class="button danger full">Réinitialiser la carrière</button></article>
+      <article class="panel next-panel"><p class="eyebrow">PROCHAIN OBJECTIF</p><h2 id="objectiveTitle">Gagner ta place</h2><p id="objectiveText" class="muted">Participe au prochain match et réalise de bonnes actions pour progresser.</p><div class="objective-track"><span id="objectiveBar"></span></div><small id="objectiveProgress">0 / 1 match joué</small><button id="nextSeasonBtn" class="button primary full hidden">Clôturer la saison et commencer la suivante</button><button id="resetGame" class="button danger full">Réinitialiser la carrière</button></article>
+    </section>
+
+
+    <section id="transferts" class="section-block two-columns">
+      <article class="panel transfer-panel">
+        <div class="section-heading compact"><div><p class="eyebrow">MARCHÉ DES TRANSFERTS</p><h2>Les offres de clubs</h2></div></div>
+        <p class="muted">Les clubs et les propositions sont fictifs. Tes performances et ta note générale influencent les possibilités.</p>
+        <div class="transfer-metrics"><div><span>Réputation</span><strong id="reputationValue">50/100</strong></div><div><span>Valeur estimée</span><strong id="marketValue">120 k€</strong></div></div>
+        <div id="transferOffer" class="transfer-offer"><h3>Aucune offre pour le moment</h3><p class="muted">Tu peux demander à ton agent de sonder le marché.</p></div>
+        <div class="transfer-buttons"><button id="generateOfferBtn" class="button primary">Rechercher une offre</button><button id="acceptOfferBtn" class="button secondary hidden">Accepter l'offre</button><button id="declineOfferBtn" class="button secondary hidden">Refuser</button></div>
+        <p id="transferMessage" class="feedback" aria-live="polite"></p>
+      </article>
+      <article class="panel history-panel">
+        <div class="section-heading compact"><div><p class="eyebrow">TON PARCOURS</p><h2>Historique des saisons</h2></div></div>
+        <p class="muted">Chaque saison terminée sera ajoutée ici. Ta carrière et tes statistiques restent sauvegardées dans ce navigateur.</p>
+        <div id="seasonHistory" class="season-history"><p class="muted">Aucune saison clôturée pour le moment.</p></div>
+      </article>
     </section>
 
     <section id="calendrier" class="section-block"><div class="section-heading"><div><p class="eyebrow">SAISON FICTIVE</p><h2>Calendrier</h2></div><span class="muted" id="fixtureCount">14 journées</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>Statut</th></tr></thead><tbody id="fixtureTable"></tbody></table></div></article></section>
