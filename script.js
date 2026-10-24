@@ -1,847 +1,168 @@
+'use strict';
 
-"use strict";
-
-// ================================================
-// FOOTBALL CAREER - MOTEUR DU JEU
-// Tous les clubs et résultats sont fictifs.
-// ================================================
-
-const STORAGE_KEY = "footballCareerCompleteV1";
-
-const INITIAL_TEAMS = [
-  "FC des Horizons",
-  "AS des Collines",
-  "ES du Littoral",
-  "Stade des Vallons",
-  "Olympique du Bocage",
-  "FC des Rives",
-  "Union Sportive des Landes",
-  "Sporting de la Forêt"
-];
-
-const TRANSFER_CLUBS = [
-  { name: "Athletic de la Côte", level: 57, description: "Un projet ambitieux dans un club en développement." },
-  { name: "FC Métropole", level: 64, description: "Un niveau supérieur et une concurrence plus forte." },
-  { name: "Académie des Étoiles", level: 72, description: "Un projet de formation exigeant." }
-];
-
-function freshState() {
-  const teams = INITIAL_TEAMS.map((name, id) => ({
-    id,
-    name: id === 0 ? "FC des Horizons" : name
-  }));
-
-  return {
-    player: {
-      name: "Lucas Morel",
-      clubId: 0,
-      age: 16,
-      overall: 55,
-      energy: 100,
-      confidence: 50,
-      shooting: 55,
-      physical: 55,
-      teamwork: 55,
-      matches: 0,
-      starts: 0,
-      substituteApps: 0,
-      goals: 0,
-      assists: 0,
-      minutes: 0,
-      ratingTotal: 0,
-      ratingCount: 0,
-      status: "Remplaçant"
-    },
-    teams,
-    fixtures: createFixtures(teams.length),
-    history: [{
-      title: "Le début d'une aventure",
-      text: "Lucas rejoint son club et découvre les exigences du championnat. Son objectif : progresser et gagner sa place.",
-      date: "Début de carrière"
-    }],
-    transfersSeen: [],
-    season: "2026-2027",
-    nextRound: 1,
-    choicesMade: [],
-    seasonFinished: false
-  };
-}
-
-// Création d'un championnat aller simple.
-// 8 équipes : 7 journées aller et 7 journées retour.
-// Chaque équipe rencontre toutes les autres deux fois.
-
-function createFixtures(teamCount) {
-  let rotation = Array.from({ length: teamCount }, (_, i) => i);
-  const firstHalf = [];
-
-  for (let round = 0; round < teamCount - 1; round++) {
-    const games = [];
-
-    for (let i = 0; i < teamCount / 2; i++) {
-      let home = rotation[i];
-      let away = rotation[teamCount - 1 - i];
-
-      if ((round + i) % 2 === 1) {
-        [home, away] = [away, home];
-      }
-
-      games.push({
-        round: round + 1,
-        home,
-        away,
-        homeGoals: null,
-        awayGoals: null,
-        played: false
-      });
-    }
-
-    firstHalf.push(...games);
-
-    // L'équipe 0 reste fixe ; les autres tournent.
-    rotation = [
-      rotation[0],
-      rotation[rotation.length - 1],
-      ...rotation.slice(1, -1)
-    ];
-  }
-
-  const secondHalf = firstHalf.map(game => ({
-    round: game.round + teamCount - 1,
-    home: game.away,
-    away: game.home,
-    homeGoals: null,
-    awayGoals: null,
-    played: false
-  }));
-
-  return [...firstHalf, ...secondHalf];
-}
-
-let state = freshState();
+const SAVE_KEY = 'footballCareerInteractiveV2';
+const TEAM_NAMES = ['FC Rivière Bleue','AC Montclair','Olympique des Pins','Stade de Valbrume','US Clairval','AS Montfaucon','Étoile du Lac','FC Hautes-Terres'];
+const DEFAULT_STATE = () => ({
+  player:{name:'Alex Martin',position:'Attaquant',number:9,club:'FC Rivière Bleue',shooting:55,physical:55,teamwork:55},
+  season:1, currentFixture:0, stats:{apps:0,starts:0,goals:0,assists:0,minutes:0,ratings:[],actions:0},
+  fixtures:[], standings:[], lastMatch:null, objectiveMatches:0
+});
+let state = loadState();
+let live = null;
+let pendingResult = null;
 
 const $ = id => document.getElementById(id);
+const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+const random = max => Math.floor(Math.random()*max);
+const average = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
 
-function currentClub() {
-  return state.teams.find(team => team.id === state.player.clubId);
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function addStory(title, text) {
-  state.history.unshift({
-    title,
-    text,
-    date: new Date().toLocaleDateString("fr-FR")
-  });
-
-  state.history = state.history.slice(0, 60);
-}
-
-function updateOverall() {
-  const p = state.player;
-
-  // La note générale reflète les compétences du joueur.
-  p.overall = clamp(
-    Math.round(
-      p.shooting * 0.45 +
-      p.physical * 0.30 +
-      p.teamwork * 0.25
-    ),
-    1,
-    100
-  );
-}
-
-function getStandings() {
-  const table = state.teams.map(team => ({
-    id: team.id,
-    name: team.name,
-    played: 0,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    gf: 0,
-    ga: 0,
-    points: 0
-  }));
-
-  for (const fixture of state.fixtures) {
-    if (!fixture.played) continue;
-
-    const home = table.find(t => t.id === fixture.home);
-    const away = table.find(t => t.id === fixture.away);
-
-    home.played++;
-    away.played++;
-
-    home.gf += fixture.homeGoals;
-    home.ga += fixture.awayGoals;
-    away.gf += fixture.awayGoals;
-    away.ga += fixture.homeGoals;
-
-    if (fixture.homeGoals > fixture.awayGoals) {
-      home.wins++;
-      away.losses++;
-      home.points += 3;
-    } else if (fixture.homeGoals < fixture.awayGoals) {
-      away.wins++;
-      home.losses++;
-      away.points += 3;
-    } else {
-      home.draws++;
-      away.draws++;
-      home.points++;
-      away.points++;
+function createFixtures(){
+  const teams = [...TEAM_NAMES];
+  // Round-robin circle algorithm: 7 rounds, then reverse fixtures for a 14-round season.
+  const rotation = teams.map((name,id)=>({id,name}));
+  const firstHalf=[];
+  for(let round=0;round<teams.length-1;round++){
+    const games=[];
+    for(let i=0;i<teams.length/2;i++){
+      const a=rotation[i], b=rotation[teams.length-1-i];
+      const home=(round+i)%2===0?a:b, away=home===a?b:a;
+      games.push({round:round+1,homeId:home.id,awayId:away.id,home:home.name,away:away.name,homeGoals:null,awayGoals:null,played:false});
     }
+    firstHalf.push(...games);
+    const fixed=rotation[0]; const tail=rotation.pop(); rotation.splice(1,0,tail); rotation[0]=fixed;
   }
-
-  return table.sort((a, b) =>
-    b.points - a.points ||
-    (b.gf - b.ga) - (a.gf - a.ga) ||
-    b.gf - a.gf ||
-    a.name.localeCompare(b.name, "fr")
-  );
+  const secondHalf=firstHalf.map(f=>({round:f.round+7,homeId:f.awayId,awayId:f.homeId,home:f.away,away:f.home,homeGoals:null,awayGoals:null,played:false}));
+  return [...firstHalf,...secondHalf];
 }
-
-function nextFixture() {
-  return state.fixtures.find(
-    f => f.round === state.nextRound && !f.played &&
-      (f.home === state.player.clubId || f.away === state.player.clubId)
-  );
-}
-
-function teamName(id) {
-  return state.teams.find(t => t.id === id)?.name || "Club inconnu";
-}
-
-// ================================================
-// AFFICHAGE
-// ================================================
-
-function renderProfile() {
-  const p = state.player;
-
-  $("player-name-input").value = p.name;
-  $("club-name-input").value = currentClub().name;
-  $("overall").textContent = p.overall;
-  $("age").textContent = p.age + " ans";
-  $("energy").textContent = p.energy + "/100";
-  $("confidence").textContent = p.confidence + "/100";
-  $("energy-bar").style.width = p.energy + "%";
-
-  $("player-status").textContent = p.status;
-  $("matches").textContent = p.matches;
-  $("starts").textContent = p.starts;
-  $("goals").textContent = p.goals;
-  $("assists").textContent = p.assists;
-  $("minutes").textContent = p.minutes;
-
-  $("average").textContent = p.ratingCount
-    ? (p.ratingTotal / p.ratingCount).toFixed(1) + "/10"
-    : "—";
-
-  $("career-status").textContent = state.seasonFinished
-    ? "Saison terminée"
-    : "Carrière en cours";
-}
-
-function renderNextMatch() {
-  const fixture = nextFixture();
-
-  $("round-label").textContent =
-    state.seasonFinished ? "Saison terminée" : "Journée " + state.nextRound;
-
-  if (!fixture) {
-    $("next-match").textContent = "Aucune rencontre disponible.";
-    $("play-match").disabled = true;
-    return;
-  }
-
-  const home = teamName(fixture.home);
-  const away = teamName(fixture.away);
-
-  $("next-match").replaceChildren();
-
-  const left = document.createElement("div");
-  const right = document.createElement("div");
-  const vs = document.createElement("div");
-
-  left.innerHTML = `<small>DOMICILE</small><strong></strong>`;
-  left.querySelector("strong").textContent = home;
-
-  right.innerHTML = `<small>EXTÉRIEUR</small><strong></strong>`;
-  right.querySelector("strong").textContent = away;
-
-  vs.className = "vs";
-  vs.textContent = "VS";
-
-  $("next-match").append(left, vs, right);
-
-  $("play-match").disabled =
-    state.seasonFinished || state.player.energy < 20;
-}
-
-function renderFixtures() {
-  const body = $("fixtures-body");
-  body.replaceChildren();
-
-  for (let round = 1; round <= 14; round++) {
-    const games = state.fixtures.filter(f => f.round === round);
-
-    for (const game of games) {
-      const tr = document.createElement("tr");
-
-      if (
-        game.home === state.player.clubId ||
-        game.away === state.player.clubId
-      ) {
-        tr.classList.add("user-team");
-      }
-
-      const values = [
-        round,
-        `${teamName(game.home)} - ${teamName(game.away)}`,
-        game.played ? `${game.homeGoals} - ${game.awayGoals}` : "—",
-        game.played ? "Terminé" : "À jouer"
-      ];
-
-      values.forEach((value, index) => {
-        const td = document.createElement("td");
-        td.textContent = value;
-
-        if (index === 2 && game.played) {
-          if (game.homeGoals > game.awayGoals) td.className = "result-win";
-          if (game.homeGoals < game.awayGoals) td.className = "result-loss";
-        }
-
-        tr.appendChild(td);
-      });
-
-      body.appendChild(tr);
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(saved && saved.player && Array.isArray(saved.fixtures) && Array.isArray(saved.standings)){
+      const base=DEFAULT_STATE();
+      return {...base,...saved,player:{...base.player,...saved.player},stats:{...base.stats,...saved.stats}};
     }
-  }
+  }catch(err){ console.warn('Sauvegarde non chargée :',err); }
+  const fresh=DEFAULT_STATE(); fresh.fixtures=createFixtures(); fresh.standings=TEAM_NAMES.map((name,id)=>({id,name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0})); return fresh;
 }
-
-function renderStandings() {
-  const body = $("standings-body");
-  body.replaceChildren();
-
-  getStandings().forEach((team, index) => {
-    const tr = document.createElement("tr");
-
-    if (team.id === state.player.clubId) {
-      tr.classList.add("user-team");
-    }
-
-    const values = [
-      index + 1,
-      team.name,
-      team.played,
-      team.wins,
-      team.draws,
-      team.losses,
-      team.gf,
-      team.ga,
-      team.gf - team.ga,
-      team.points
-    ];
-
-    values.forEach(value => {
-      const td = document.createElement("td");
-      td.textContent = value;
-      tr.appendChild(td);
-    });
-
-    body.appendChild(tr);
-  });
+function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(err){console.warn('Sauvegarde locale impossible :',err);}}
+function getOverall(){return Math.round((state.player.shooting+state.player.physical+state.player.teamwork)/3);}
+function getFixture(){return state.fixtures.find(f=>!f.played) || null;}
+function teamName(id){return id===0?state.player.club:TEAM_NAMES[id]||'Club fictif';}
+function refreshTeamNames(){state.fixtures.forEach(f=>{f.home=teamName(f.homeId);f.away=teamName(f.awayId);});if(state.standings[0])state.standings[0].name=state.player.club;}
+function updatePlayerUI(){
+  $('playerName').value=state.player.name; $('playerPosition').value=state.player.position; $('playerNumber').value=state.player.number; $('clubName').value=state.player.club;
+  const overall=getOverall(); $('overall').textContent=overall; $('overallBar').style.width=overall+'%';
+  ['shooting','physical','teamwork'].forEach(key=>{$(key+'Value').textContent=state.player[key];$(key+'Bar').style.width=state.player[key]+'%';});
+  $('playerStatus').textContent=overall>=80?'Cadre de l’équipe · très haut niveau':overall>=65?'Joueur important · en progression':'Jeune espoir · prêt à faire ses preuves';
+  $('apps').textContent=state.stats.apps; $('starts').textContent=state.stats.starts; $('goals').textContent=state.stats.goals; $('assists').textContent=state.stats.assists; $('minutes').textContent=state.stats.minutes; $('averageRating').textContent=state.stats.ratings.length?average(state.stats.ratings).toFixed(1):'—';
+  $('objectiveProgress').textContent=`${state.objectiveMatches} / 5 matchs joués`; $('objectiveBar').style.width=Math.min(100,state.objectiveMatches/5*100)+'%';
+  $('objectiveTitle').textContent=state.objectiveMatches>=5?'Objectif atteint !':'Gagner ta place';
+  $('objectiveText').textContent=state.objectiveMatches>=5?'Tu as participé à cinq rencontres. Continue à progresser pour devenir un joueur incontournable.':'Participe à cinq rencontres pour atteindre ton premier objectif de carrière.';
 }
-
-function renderHistory() {
-  const container = $("story");
-  container.replaceChildren();
-
-  state.history.forEach(entry => {
-    const article = document.createElement("article");
-    article.className = "story-entry";
-
-    const time = document.createElement("time");
-    time.textContent = entry.date;
-
-    const title = document.createElement("h3");
-    title.textContent = entry.title;
-
-    const text = document.createElement("p");
-    text.textContent = entry.text;
-
-    article.append(time, title, text);
-    container.appendChild(article);
-  });
+function updatePreMatch(){
+  const f=getFixture();
+  $('preMatch').classList.remove('hidden'); $('liveMatch').classList.add('hidden'); $('postMatch').classList.add('hidden');
+  if(!f){$('matchStatus').textContent='Saison terminée';$('matchRound').textContent='Fin de saison';$('homeTeam').textContent=state.player.club;$('awayTeam').textContent='Fin de saison';$('opponentInfo').textContent='Toutes les journées sont terminées. Réinitialise la carrière pour recommencer.';$('startStarter').disabled=true;$('startSub').disabled=true;return;}
+  $('startStarter').disabled=false;$('startSub').disabled=false;
+  $('matchStatus').textContent='À préparer'; $('matchRound').textContent=`Journée ${f.round}`; $('homeTeam').textContent=f.home; $('awayTeam').textContent=f.away;
+  const isHome=f.homeId===0; $('matchVenue').textContent=isHome?'À domicile':'À l’extérieur'; $('kickoff').textContent='Coup d’envoi à venir';
+  $('opponentInfo').textContent=`${isHome?'Tu joues à domicile contre':'Tu te déplaces chez'} ${isHome?f.away:f.home}. Prépare-toi à faire la différence.`;
 }
-
-function render() {
-  renderProfile();
-  renderNextMatch();
-  renderFixtures();
-  renderStandings();
-  renderHistory();
+function renderFixtures(){
+  const body=$('fixtureTable'); body.innerHTML='';
+  state.fixtures.forEach((f,index)=>{const tr=document.createElement('tr');let score='—',status='À jouer';if(f.played){score=`${f.homeGoals} - ${f.awayGoals}`;status='Terminé';}else if(live && live.fixtureIndex===index){status='En direct';}
+    tr.innerHTML=`<td>${f.round}</td><td class="team-cell">${escapeHTML(f.home)} <span class="muted">vs</span> ${escapeHTML(f.away)}</td><td class="score-cell">${score}</td><td>${status}</td>`;body.appendChild(tr);});
+  $('fixtureCount').textContent=`${state.fixtures.filter(f=>f.played).length} / ${state.fixtures.length} matchs terminés`;
 }
-
-// ================================================
-// PROFIL PERSONNALISABLE
-// ================================================
-
-$("apply-profile").addEventListener("click", () => {
-  const playerName = $("player-name-input").value.trim();
-  const clubName = $("club-name-input").value.trim();
-
-  if (!playerName || !clubName) {
-    $("match-feedback").textContent =
-      "Le nom du joueur et le nom du club sont obligatoires.";
-    return;
-  }
-
-  state.player.name = playerName.slice(0, 40);
-  currentClub().name = clubName.slice(0, 50);
-
-  addStory(
-    "Une nouvelle identité",
-    `${state.player.name} poursuit sa carrière avec ${currentClub().name}.`
-  );
-
-  $("match-feedback").textContent = "Profil mis à jour.";
-  render();
-});
-
-// ================================================
-// ENTRAÎNEMENTS
-// ================================================
-
-document.querySelectorAll("[data-training]").forEach(button => {
-  button.addEventListener("click", () => {
-    if (state.seasonFinished) {
-      $("match-feedback").textContent =
-        "La saison est terminée. Commence une nouvelle carrière pour continuer.";
-      return;
-    }
-
-    const p = state.player;
-    const type = button.dataset.training;
-
-    if (type === "rest") {
-      if (p.energy === 100) {
-        $("match-feedback").textContent =
-          "Ton énergie est déjà au maximum.";
-        return;
-      }
-
-      p.energy = 100;
-      p.confidence = clamp(p.confidence + 2, 0, 100);
-
-      addStory(
-        "Récupération",
-        `${p.name} prend le temps de récupérer avant le prochain match.`
-      );
-    } else {
-      const cost = type === "shooting" ? 25 : 30;
-
-      if (p.energy < cost) {
-        $("match-feedback").textContent =
-          "Pas assez d'énergie. Choisis une séance de récupération.";
-        return;
-      }
-
-      p.energy -= cost;
-
-      if (type === "shooting") {
-        p.shooting = clamp(p.shooting + 3, 0, 100);
-        p.teamwork = clamp(p.teamwork + 1, 0, 100);
-      } else {
-        p.physical = clamp(p.physical + 3, 0, 100);
-      }
-
-      p.confidence = clamp(p.confidence + 3, 0, 100);
-      updateOverall();
-
-      addStory(
-        type === "shooting" ? "Travail devant le but" : "Préparation physique",
-        `${p.name} progresse à l'entraînement. Sa note générale atteint ${p.overall}/100.`
-      );
-    }
-
-    $("match-feedback").textContent = "Séance terminée.";
-    render();
-  });
-});
-
-// ================================================
-// MATCHS ET CLASSEMENT
-// ================================================
-
-function simulateTeamGoals(teamId) {
-  const team = state.teams.find(t => t.id === teamId);
-  const isPlayerTeam = teamId === state.player.clubId;
-
-  let strength = isPlayerTeam
-    ? state.player.overall / 20
-    : 1.5 + Math.random() * 1.4;
-
-  return clamp(Math.floor(Math.random() * 3 + strength - 2), 0, 5);
+function renderStandings(){
+  const rows=state.standings.map(t=>({...t,name:t.id===0?state.player.club:t.name})).sort((a,b)=>b.points-a.points||(b.for-b.against)-(a.for-a.against)||b.for-a.for||a.name.localeCompare(b.name));
+  $('standingsTable').innerHTML=''; rows.forEach((t,i)=>{const tr=document.createElement('tr');if(t.id===0)tr.classList.add('current-team');tr.innerHTML=`<td>${i+1}</td><td class="team-cell">${escapeHTML(t.name)}${t.id===0?' <span class="muted">(toi)</span>':''}</td><td>${t.played}</td><td>${t.wins}</td><td>${t.draws}</td><td>${t.losses}</td><td>${t.for-t.against>0?'+':''}${t.for-t.against}</td><td><b>${t.points}</b></td>`;$('standingsTable').appendChild(tr);});
 }
-
-function simulateOtherFixtures(round, playerFixture) {
-  for (const game of state.fixtures) {
-    if (game.round !== round || game === playerFixture) continue;
-
-    game.homeGoals = simulateTeamGoals(game.home);
-    game.awayGoals = simulateTeamGoals(game.away);
-    game.played = true;
-  }
+function renderAll(){refreshTeamNames();updatePlayerUI();updatePreMatch();renderFixtures();renderStandings();}
+function escapeHTML(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function beginMatch(asStarter){
+  if(live)return; const f=getFixture(); if(!f)return;
+  const playerHome=f.homeId===0;
+  live={fixtureIndex:state.fixtures.indexOf(f),fixture:f,asStarter,minute:asStarter?1:1,playerOnPitch:!!asStarter,entered:!!asStarter,subbedOff:false,homeGoals:0,awayGoals:0,fatigue:0,rating:6.0,actions:0,successful:0,goals:0,assists:0,minutes:0,events:[],lastAction:null,ended:false};
+  $('preMatch').classList.add('hidden');$('postMatch').classList.add('hidden');$('liveMatch').classList.remove('hidden');$('matchStatus').textContent='En direct';
+  $('liveHomeName').textContent=f.home;$('liveAwayName').textContent=f.away;$('homeScore').textContent='0';$('awayScore').textContent='0';$('matchMinute').textContent='1\'';$('matchProgress').style.width='1%';$('liveMinutes').textContent='0 min';$('liveRating').textContent='6.0';$('liveFatigue').textContent='0%';$('actionFeedback').textContent='';$('commentary').innerHTML='';
+  if(asStarter){setEvent('Coup d’envoi !',`Tu es titulaire avec ${state.player.club}. Le ballon circule au milieu de terrain. Choisis tes actions pour peser sur le match.`);addCommentary('Coup d’envoi ! Tu débutes la rencontre sur le terrain.');}
+  else {setEvent('Sur le banc',`Tu commences remplaçant. Observe le match et clique sur « Continuer le match » pour faire avancer le temps jusqu’à une occasion d’entrer en jeu.`);addCommentary('Tu prends place sur le banc. Le coach pourrait faire appel à toi.');}
+  updateLiveUI();
 }
-
-$("play-match").addEventListener("click", () => {
-  const p = state.player;
-  const fixture = nextFixture();
-
-  if (!fixture || state.seasonFinished || p.energy < 20) return;
-
-  const role = $("role-select").value;
-  const isStarter = role === "starter";
-  const minutes = isStarter ? 90 : 30;
-
-  const attackingChance = clamp(
-    (p.shooting * 0.45 + p.overall * 0.55) / 100,
-    0.05,
-    0.95
-  );
-
-  // Les buts du joueur sont simulés séparément du score collectif.
-  let playerGoals = 0;
-  let playerAssists = 0;
-
-  if (Math.random() < attackingChance * minutes / 90) playerGoals++;
-  if (Math.random() < attackingChance * 0.2 * minutes / 90) playerGoals++;
-  if (Math.random() < p.teamwork / 100 * 0.35 * minutes / 90) playerAssists++;
-
-  const isHome = fixture.home === p.clubId;
-
-  let ourGoals = simulateTeamGoals(p.clubId);
-  let theirGoals = simulateTeamGoals(isHome ? fixture.away : fixture.home);
-
-  // Une performance offensive peut influencer le score du club.
-  ourGoals = Math.min(5, ourGoals + playerGoals);
-
-  fixture.homeGoals = isHome ? ourGoals : theirGoals;
-  fixture.awayGoals = isHome ? theirGoals : ourGoals;
-  fixture.played = true;
-
-  simulateOtherFixtures(state.nextRound, fixture);
-
-  p.matches++;
-  if (isStarter) {
-    p.starts++;
-    p.status = "Titulaire";
-  } else {
-    p.substituteApps++;
-    p.status = "Entré en jeu";
+function setEvent(title,description){$('eventTitle').textContent=title;$('eventDescription').textContent=description;}
+function addCommentary(text){const p=document.createElement('p');p.textContent=text;$('commentary').prepend(p);while($('commentary').children.length>8)$('commentary').lastElementChild.remove();}
+function updateLiveUI(){
+  if(!live)return;
+  $('matchMinute').textContent=`${Math.min(90,live.minute)}'`; $('homeScore').textContent=live.homeGoals; $('awayScore').textContent=live.awayGoals; $('matchProgress').style.width=Math.min(100,live.minute/90*100)+'%';$('liveMinutes').textContent=`${live.minutes} min`;$('liveRating').textContent=live.rating.toFixed(1);$('liveFatigue').textContent=live.fatigue+'%';
+  const actionsEnabled=live.playerOnPitch && !live.ended;
+  document.querySelectorAll('[data-action]').forEach(btn=>btn.disabled=!actionsEnabled);
+  $('advanceMatch').classList.toggle('hidden',live.ended);$('substituteMe').classList.toggle('hidden',!live.playerOnPitch||live.ended||live.subbedOff);
+}
+function advanceTime(){
+  if(!live||live.ended)return;
+  const step=live.minute<15?8:live.minute<70?10:7;live.minute=Math.min(90,live.minute+step);
+  if(live.playerOnPitch){live.minutes+=step;live.fatigue=clamp(live.fatigue+Math.max(2,Math.round(step/3)),0,100);}
+  const f=live.fixture; const homeAttack=Math.random()<.5;
+  // A non-player event can change the score occasionally; all scores are generated fictionally.
+  if(Math.random()<.28){const goal=Math.random()<.18;const team=homeAttack?f.home:f.away;if(goal){if(homeAttack)live.homeGoals++;else live.awayGoals++;const line=`${live.minute}' — BUT pour ${team} ! ${live.homeGoals}-${live.awayGoals}.`;addCommentary(line);setEvent('BUUUT !',line);live.rating=clamp(live.rating+(live.playerOnPitch&&((homeAttack&&f.homeId===0)||(!homeAttack&&f.awayId===0))?.1:0),4,10);}else{const line=`${live.minute}' — ${team} tente de construire une attaque, mais la défense reste solide.`;addCommentary(line);setEvent('Le jeu se poursuit',line);}}
+  else {const line=`${live.minute}' — Le jeu se déroule au milieu de terrain. Le score reste ${live.homeGoals}-${live.awayGoals}.`;setEvent('Le match se poursuit',line);addCommentary(line);}
+  if(!live.entered && live.minute>=55){live.entered=true;live.playerOnPitch=true;live.minutes=0;live.fatigue=0;setEvent('Le coach t’appelle !',`Tu entres en jeu à la ${live.minute}e minute. Profite de tes minutes pour aider ${state.player.club}.`);addCommentary(`${live.minute}' — Changement : tu entres sur le terrain !`);$('actionFeedback').textContent='Tu es entré en jeu. À toi de faire la différence !';}
+  if(live.minute>=90){endMatch();return;}
+  updateLiveUI();
+}
+function takeAction(action){
+  if(!live||!live.playerOnPitch||live.ended)return;
+  live.actions++;state.stats.actions++;
+  const fatiguePenalty=live.fatigue*.12;
+  const skill=action==='shoot'?state.player.shooting:action==='dribble'?state.player.physical:state.player.teamwork;
+  const base=clamp(.42+(skill-50)/150-fatiguePenalty/100,.12,.88);
+  let success=Math.random()<base;let msg='';
+  if(action==='shoot'){
+    if(success){const goalChance=.18+(state.player.shooting/100)*.28;if(Math.random()<goalChance){scoreForPlayerTeam();live.goals++;state.stats.goals++;live.rating=clamp(live.rating+.65,1,10);msg='BUT ! Tu conclus l’action avec sang-froid. Le public se lève !';addCommentary(`${live.minute}' — BUT de ${state.player.name} !`);setEvent('⚽ BUT !',msg);}else{live.rating=clamp(live.rating+.15,1,10);msg='Belle frappe cadrée, mais le gardien repousse le ballon.';addCommentary(`${live.minute}' — Ta frappe est arrêtée par le gardien.`);setEvent('Belle occasion',msg);}}
+    else{live.rating=clamp(live.rating-.1,1,10);msg='Ta frappe est contrée par un défenseur. Replace-toi et tente une autre action.';addCommentary(`${live.minute}' — Frappe contrée.`);setEvent('Frappe contrée',msg);}
+  }else if(action==='pass'){
+    if(success){live.successful++;live.rating=clamp(live.rating+.18,1,10);if(Math.random()<.15){scoreForPlayerTeam();live.assists++;state.stats.assists++;live.rating=clamp(live.rating+.55,1,10);msg='Passe décisive ! Ton coéquipier transforme ton ballon en but.';addCommentary(`${live.minute}' — Passe décisive de ${state.player.name} !`);setEvent('Passe décisive !',msg);}else{msg='Passe réussie : tu trouves un partenaire entre les lignes et l’équipe conserve le ballon.';addCommentary(`${live.minute}' — Bonne passe vers un partenaire.`);setEvent('Bonne circulation',msg);}}
+    else{msg='La passe est interceptée. L’adversaire récupère le ballon.';live.rating=clamp(live.rating-.12,1,10);addCommentary(`${live.minute}' — Passe interceptée.`);setEvent('Ballon perdu',msg);}
+  }else if(action==='dribble'){
+    if(success){live.successful++;live.rating=clamp(live.rating+.22,1,10);msg='Dribble réussi ! Tu élimines ton adversaire et fais avancer le jeu.';addCommentary(`${live.minute}' — ${state.player.name} réussit un joli dribble.`);setEvent('Adversaire éliminé',msg);if(Math.random()<.14){scoreForPlayerTeam();live.assists++;state.stats.assists++;msg+=' Tu délivres ensuite une passe décisive !';setEvent('Percée décisive',msg);}}
+    else{live.rating=clamp(live.rating-.18,1,10);msg='Le défenseur a bien lu ton geste et récupère le ballon.';addCommentary(`${live.minute}' — Dribble stoppé par la défense.`);setEvent('Dribble stoppé',msg);}
+  }else{
+    if(success){live.successful++;live.rating=clamp(live.rating+.2,1,10);msg='Excellent choix collectif : tu aides l’équipe à garder le contrôle du ballon.';addCommentary(`${live.minute}' — Jeu collectif propre de ${state.player.name}.`);setEvent('Bon choix collectif',msg);if(Math.random()<.09){scoreForPlayerTeam();live.assists++;state.stats.assists++;msg+=' L’action se termine par une passe décisive !';setEvent('Action collective décisive',msg);}}
+    else{msg='L’équipe perd le ballon dans la circulation. Replie-toi rapidement.';addCommentary(`${live.minute}' — Perte de balle au milieu.`);setEvent('Attention à la transition',msg);}
   }
+  live.lastAction=action;live.fatigue=clamp(live.fatigue+6,0,100);$('actionFeedback').textContent=msg;updateLiveUI();
+  // Each player action advances the match a few minutes without requiring an extra click.
+  live.minute=Math.min(90,live.minute+4);live.minutes+=4;live.fatigue=clamp(live.fatigue+2,0,100);
+  if(live.minute>=90){endMatch();return;}updateLiveUI();
+}
+function scoreForPlayerTeam(){if(live.fixture.homeId===0)live.homeGoals++;else live.awayGoals++;}
+function askToBeSubbed(){if(!live||!live.playerOnPitch||live.ended)return;live.playerOnPitch=false;live.subbedOff=true;setEvent('Tu es remplacé',`Tu quittes le terrain après ${live.minutes} minutes de jeu. Encourage tes coéquipiers jusqu’au coup de sifflet final.`);addCommentary(`${live.minute}' — Tu es remplacé. Fin de ton match personnel.`);$('actionFeedback').textContent='Tu as terminé ton match. Tu peux suivre la fin de la rencontre.';updateLiveUI();}
+function endMatch(){
+  if(!live||live.ended)return;live.ended=true;live.minute=90;
+  const f=live.fixture;f.played=true;f.homeGoals=live.homeGoals;f.awayGoals=live.awayGoals;
+  const playerPlayed=live.entered&&live.minutes>0;
+  if(playerPlayed){state.stats.apps++;state.stats.minutes+=live.minutes;state.stats.ratings.push(Number(live.rating.toFixed(1)));state.objectiveMatches++;if(live.asStarter)state.stats.starts++;}
+  updateStandings(f);state.lastMatch={round:f.round,home:f.home,away:f.away,homeGoals:f.homeGoals,awayGoals:f.awayGoals,minutes:live.minutes,rating:live.rating,goals:live.goals,assists:live.assists};
+  saveState();$('matchStatus').textContent='Terminé';$('liveMatch').classList.add('hidden');$('preMatch').classList.add('hidden');$('postMatch').classList.remove('hidden');
+  const playerGoals=live.goals;let headline=f.homeGoals>f.awayGoals?`${f.home} remporte le match !`:f.homeGoals<f.awayGoals?`${f.away} remporte le match !`:'Match nul';$('finalHeadline').textContent=headline;$('finalHomeScore').textContent=f.homeGoals;$('finalAwayScore').textContent=f.awayGoals;
+  $('finalSummary').textContent=playerPlayed?`${state.player.name} a joué ${live.minutes} minutes et termine avec une note de ${live.rating.toFixed(1)}/10.`:`Tu n’es pas entré en jeu lors de cette rencontre.`;
+  $('finalMinutes').textContent=`${live.minutes} min`;$('finalRating').textContent=playerPlayed?`${live.rating.toFixed(1)}/10`:'Non noté';$('finalActions').textContent=`${live.successful}/${live.actions}`;
+  const highlights=[];if(playerGoals)highlights.push(`⚽ ${playerGoals} but(s) marqué(s) par ${state.player.name}.`);if(live.assists)highlights.push(`🎯 ${live.assists} passe(s) décisive(s).`);highlights.push(`📊 Score final : ${f.home} ${f.homeGoals} - ${f.awayGoals} ${f.away}.`);highlights.push(playerPlayed?`⭐ Note individuelle : ${live.rating.toFixed(1)}/10.`:'🪑 Rencontre suivie depuis le banc.');$('matchHighlights').innerHTML=highlights.map(t=>`<p>${escapeHTML(t)}</p>`).join('');
+  live=null;refreshTeamNames();updatePlayerUI();renderFixtures();renderStandings();saveState();
+}
+function updateStandings(f){
+  const h=state.standings.find(t=>t.id===f.homeId),a=state.standings.find(t=>t.id===f.awayId);if(!h||!a)return;
+  h.played++;a.played++;h.for+=f.homeGoals;h.against+=f.awayGoals;a.for+=f.awayGoals;a.against+=f.homeGoals;
+  if(f.homeGoals>f.awayGoals){h.wins++;h.points+=3;a.losses++;}else if(f.homeGoals<f.awayGoals){a.wins++;a.points+=3;h.losses++;}else{h.draws++;a.draws++;h.points++;a.points++;}
+}
+function train(type){if(live){$('trainingMessage').textContent='Termine le match avant de t’entraîner.';return;}if(type==='rest'){if(state.player.physical<100)state.player.physical=clamp(state.player.physical+1,0,100);$('trainingMessage').textContent='Repos effectué : tu récupères et reprends confiance.';}else{const old=state.player[type];state.player[type]=clamp(old+1,0,99);const labels={shooting:'Finition',physical:'Physique',teamwork:'Collectif'};$('trainingMessage').textContent=state.player[type]>old?`${labels[type]} améliorée : ${old} → ${state.player[type]}.`:'Cette compétence est déjà au maximum.';}updatePlayerUI();saveState();}
+function saveProfile(){state.player.name=$('playerName').value.trim()||'Alex Martin';state.player.position=$('playerPosition').value;state.player.number=clamp(Number($('playerNumber').value)||9,1,99);state.player.club=$('clubName').value.trim()||'FC Rivière Bleue';refreshTeamNames();renderAll();saveState();$('trainingMessage').textContent='Profil enregistré.';}
+function resetGame(){state=DEFAULT_STATE();state.fixtures=createFixtures();state.standings=TEAM_NAMES.map((name,id)=>({id,name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0}));live=null;pendingResult=null;saveState();renderAll();$('confirmDialog').close();$('trainingMessage').textContent='Nouvelle carrière créée.';}
 
-  p.minutes += minutes;
-  p.goals += playerGoals;
-  p.assists += playerAssists;
-  p.energy = clamp(p.energy - (isStarter ? 35 : 20), 0, 100);
+$('startStarter').addEventListener('click',()=>beginMatch(true));$('startSub').addEventListener('click',()=>beginMatch(false));$('advanceMatch').addEventListener('click',advanceTime);$('substituteMe').addEventListener('click',askToBeSubbed);document.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>takeAction(btn.dataset.action)));document.querySelectorAll('[data-training]').forEach(btn=>btn.addEventListener('click',()=>train(btn.dataset.training)));$('saveProfileBtn').addEventListener('click',saveProfile);$('finishMatch').addEventListener('click',()=>{live=null;renderAll();saveState();$('match').scrollIntoView({behavior:'smooth'});});$('resetGame').addEventListener('click',()=>{if(typeof $('confirmDialog').showModal==='function')$('confirmDialog').showModal();else if(confirm('Réinitialiser la carrière ?'))resetGame();});$('confirmReset').addEventListener('click',event=>{event.preventDefault();resetGame();});
 
-  const performanceRating = clamp(
-    5.5 + Math.random() * 2 +
-    playerGoals * 1.2 + playerAssists * 0.6 +
-    (isStarter ? 0.2 : 0),
-    1,
-    10
-  );
-
-  p.ratingTotal += performanceRating;
-  p.ratingCount++;
-
-  const won = ourGoals > theirGoals;
-  const lost = ourGoals < theirGoals;
-
-  p.confidence = clamp(
-    p.confidence + (won ? 7 : lost ? -4 : 2) +
-    playerGoals * 2,
-    0,
-    100
-  );
-
-  if (playerGoals > 0) {
-    p.shooting = clamp(p.shooting + 1, 0, 100);
-  }
-
-  if (p.matches >= 3 && p.overall >= 58) {
-    p.status = "Dans la rotation";
-  }
-
-  updateOverall();
-
-  const opponentId = isHome ? fixture.away : fixture.home;
-  const resultText = won ? "victoire" : lost ? "défaite" : "match nul";
-
-  addStory(
-    `Journée ${state.nextRound} : ${resultText}`,
-    `${p.name} a joué ${minutes} minutes contre ${teamName(opponentId)}. Score : ${ourGoals}-${theirGoals}. Note du match : ${performanceRating.toFixed(1)}/10. Buts : ${playerGoals}. Passes décisives : ${playerAssists}.`
-  );
-
-  $("match-feedback").textContent =
-    `${resultText.charAt(0).toUpperCase() + resultText.slice(1)} ${ourGoals}-${theirGoals}. ` +
-    `${p.name} : ${minutes} minutes, ${playerGoals} but(s), ${playerAssists} passe(s) décisive(s).`;
-
-  state.nextRound++;
-
-  if (state.nextRound > 14) {
-    state.seasonFinished = true;
-
-    const position = getStandings().findIndex(t => t.id === p.clubId) + 1;
-
-    addStory(
-      "Fin de saison",
-      `${p.name} termine sa première saison à la ${position}e place du championnat. Une nouvelle étape se prépare.`
-    );
-
-    $("match-feedback").textContent +=
-      ` Saison terminée : ton club termine ${position}e.`;
-  }
-
-  render();
-});
-
-// ================================================
-// CHOIX NARRATIFS
-// ================================================
-
-const narrativeChoices = {
-  team: {
-    confidence: 5,
-    teamwork: 4,
-    title: "Le choix du collectif",
-    text: "Lucas privilégie le jeu collectif. Il cherche à mieux combiner avec ses coéquipiers."
-  },
-  ambition: {
-    confidence: -2,
-    shooting: 4,
-    title: "Une ambition affirmée",
-    text: "Lucas se fixe des objectifs plus élevés et décide de travailler davantage sa finition."
-  },
-  coach: {
-    confidence: 3,
-    physical: 2,
-    title: "L'écoute de l'entraîneur",
-    text: "Lucas écoute les conseils du coach et travaille avec sérieux pour gagner sa place."
-  }
-};
-
-document.querySelectorAll("[data-choice]").forEach(button => {
-  button.addEventListener("click", () => {
-    if (state.seasonFinished) {
-      $("choice-feedback").textContent =
-        "Cette saison est terminée. Tu pourras prendre de nouvelles décisions lors de la prochaine carrière.";
-      return;
-    }
-
-    const choice = button.dataset.choice;
-
-    if (state.choicesMade.includes(choice)) {
-      $("choice-feedback").textContent =
-        "Tu as déjà pris cette décision. Choisis une autre orientation.";
-      return;
-    }
-
-    const option = narrativeChoices[choice];
-    if (!option) return;
-
-    state.choicesMade.push(choice);
-
-    state.player.confidence = clamp(
-      state.player.confidence + option.confidence, 0, 100
-    );
-
-    state.player.teamwork = clamp(
-      state.player.teamwork + (option.teamwork || 0), 0, 100
-    );
-
-    state.player.shooting = clamp(
-      state.player.shooting + (option.shooting || 0), 0, 100
-    );
-
-    state.player.physical = clamp(
-      state.player.physical + (option.physical || 0), 0, 100
-    );
-
-    updateOverall();
-    addStory(option.title, option.text);
-
-    $("choice-feedback").textContent = option.text;
-    render();
-  });
-});
-
-// ================================================
-// TRANSFERTS
-// ================================================
-
-$("check-transfers").addEventListener("click", () => {
-  const p = state.player;
-  const list = $("transfer-list");
-  list.replaceChildren();
-
-  if (state.seasonFinished === false && p.matches < 3 && p.overall < 60) {
-    $("transfer-intro").textContent =
-      "Les recruteurs attendent davantage de performances. Joue au moins trois matchs ou améliore ta note générale.";
-    return;
-  }
-
-  const available = TRANSFER_CLUBS.filter(club =>
-    club.level <= p.overall + 12 &&
-    !state.transfersSeen.includes(club.name) &&
-    club.name !== currentClub().name
-  );
-
-  if (available.length === 0) {
-    $("transfer-intro").textContent =
-      "Aucune nouvelle proposition pour le moment. Continue à progresser ou vérifie à nouveau après tes prochains matchs.";
-    return;
-  }
-
-  $("transfer-intro").textContent =
-    "Des clubs fictifs s'intéressent à ton joueur. À toi de décider.";
-
-  available.forEach(club => {
-    const card = document.createElement("article");
-    card.className = "panel";
-
-    const title = document.createElement("h3");
-    title.textContent = club.name;
-
-    const level = document.createElement("p");
-    level.textContent = `Niveau sportif estimé : ${club.level}/100`;
-
-    const description = document.createElement("p");
-    description.textContent = club.description;
-
-    const accept = document.createElement("button");
-    accept.className = "button";
-    accept.textContent = "Accepter le transfert";
-
-    accept.addEventListener("click", () => {
-      const oldClub = currentClub().name;
-      currentClub().name = club.name;
-      p.energy = 100;
-      p.confidence = clamp(p.confidence + 5, 0, 100);
-      p.status = "Nouvelle recrue";
-
-      state.transfersSeen.push(club.name);
-
-      addStory(
-        "Un nouveau chapitre",
-        `${p.name} quitte ${oldClub} pour rejoindre ${club.name}. Un nouveau défi commence !`
-      );
-
-      $("transfer-intro").textContent =
-        `Transfert accepté : ${p.name} rejoint ${club.name}.`;
-
-      list.replaceChildren();
-      render();
-    });
-
-    card.append(title, level, description, accept);
-    list.appendChild(card);
-  });
-});
-
-// ================================================
-// SAUVEGARDE ET CHARGEMENT
-// ================================================
-
-$("save-game").addEventListener("click", () => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    $("save-feedback").textContent =
-      "Carrière sauvegardée dans ce navigateur.";
-  } catch {
-    $("save-feedback").textContent =
-      "Sauvegarde impossible. Vérifie les paramètres du navigateur.";
-  }
-});
-
-$("load-game").addEventListener("click", () => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if (!saved) {
-      $("save-feedback").textContent = "Aucune sauvegarde trouvée.";
-      return;
-    }
-
-    const parsed = JSON.parse(saved);
-
-    if (
-      !parsed ||
-      !parsed.player ||
-      !Array.isArray(parsed.teams) ||
-      !Array.isArray(parsed.fixtures) ||
-      !Array.isArray(parsed.history) ||
-      !Number.isInteger(parsed.nextRound) ||
-      parsed.nextRound < 1 ||
-      parsed.nextRound > 15 ||
-      parsed.teams.length !== 8 ||
-      parsed.fixtures.length !== 56 ||
-      !parsed.teams.some(t => t.id === parsed.player.clubId) ||
-      !parsed.fixtures.every(f =>
-        Number.isInteger(f.round) &&
-        f.round >= 1 && f.round <= 14 &&
-        Number.isInteger(f.home) &&
-        Number.isInteger(f.away) &&
-        typeof f.played === "boolean" &&
-        (f.played
-          ? Number.isInteger(f.homeGoals) &&
-            Number.isInteger(f.awayGoals) &&
-            f.homeGoals >= 0 && f.homeGoals <= 5 &&
-            f.awayGoals >= 0 && f.awayGoals <= 5
-          : f.homeGoals === null && f.awayGoals === null)
-      )
-    ) {
-      throw new Error("Sauvegarde invalide");
-    }
-
-    state = parsed;
-    render();
-    $("save-feedback").textContent = "Carrière chargée.";
-  } catch {
-    $("save-feedback").textContent =
-      "Impossible de charger cette sauvegarde.";
-  }
-});
-
-$("reset-game").addEventListener("click", () => {
-  if (!confirm("Recommencer ? La carrière en cours sera remplacée.")) return;
-
-  state = freshState();
-  render();
-
-  $("transfer-list").replaceChildren();
-  $("transfer-intro").textContent =
-    "Joue des matchs et progresse pour attirer l'attention d'autres clubs.";
-
-  $("save-feedback").textContent =
-    "Nouvelle carrière créée. Pense à la sauvegarder.";
-  $("match-feedback").textContent = "";
-  $("choice-feedback").textContent =
-    "Tes décisions influencent ta progression.";
-});
-
-// Initialisation
-render();
+// Support older saves from the previous prototype: add any missing league data safely.
+if(!state.fixtures.length)state.fixtures=createFixtures();
+if(!state.standings.length)state.standings=TEAM_NAMES.map((name,id)=>({id,name,played:0,wins:0,draws:0,losses:0,for:0,against:0,points:0}));
+refreshTeamNames();renderAll();saveState();

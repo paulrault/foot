@@ -1,242 +1,56 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#08111f">
-  <meta name="description" content="Football Career : construis une carrière de footballeur interactive.">
-  <title>Football Career | Ma carrière</title>
+  <meta name="description" content="Football Career : une carrière de football interactive avec des clubs et des matchs fictifs.">
+  <title>Football Career — Matchs interactifs</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="logo" href="#accueil">FC <span>CAREER</span></a>
-    <nav>
-      <a href="#profil">Joueur</a>
-      <a href="#matchs">Matchs</a>
-      <a href="#classement">Classement</a>
-      <a href="#transferts">Transferts</a>
-      <a href="#journal">Histoire</a>
+  <header class="site-header">
+    <a class="brand" href="#accueil" aria-label="Football Career accueil"><span class="brand-ball">⚽</span><span>FOOTBALL <b>CAREER</b></span></a>
+    <nav aria-label="Navigation principale">
+      <a href="#carriere">Ma carrière</a><a href="#match">Match interactif</a><a href="#calendrier">Calendrier</a><a href="#classement">Classement</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="hero" id="accueil">
-      <span class="eyebrow">SAISON 2026–2027 · MODE CARRIÈRE</span>
-      <h1>Ta carrière.<br> Tes décisions. Ton histoire.</h1>
-      <p>Chaque entraînement, chaque match et chaque décision peuvent changer ton avenir.</p>
-      <a class="button" href="#matchs">Continuer la carrière ↓</a>
+    <section id="accueil" class="hero panel">
+      <div class="hero-copy"><p class="eyebrow">MODE CARRIÈRE · SAISON 1</p><h1>Écris ta propre<br><span>histoire de football.</span></h1><p>Prends tes décisions sur le terrain, gagne ta place et fais progresser ton joueur match après match.</p><a class="button primary" href="#match">Jouer le prochain match ↓</a><p class="fiction-note">Univers de jeu fictif : tous les clubs, joueurs et résultats sont inventés.</p></div>
+      <div class="hero-ball" aria-hidden="true">⚽</div>
     </section>
 
-    <section class="section" id="profil">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">IDENTITÉ</span>
-          <h2>Mon joueur</h2>
-        </div>
-        <span class="status" id="career-status">Carrière en cours</span>
-      </div>
-
-      <div class="panel">
-        <div class="profile-grid">
-          <div class="shirt">09</div>
-          <div>
-            <label for="player-name-input">Nom du joueur</label>
-            <input id="player-name-input" maxlength="40" value="Lucas Morel">
-            <label for="club-name-input">Club de départ</label>
-            <input id="club-name-input" maxlength="50" value="FC des Horizons">
-            <button class="button" id="apply-profile">Valider le profil</button>
-            <p class="muted">Le nom du club est personnalisable. Les équipes de ce championnat sont fictives.</p>
-          </div>
-          <div class="rating">
-            <span>NOTE GÉNÉRALE</span>
-            <strong id="overall">55</strong>
-            <span>/100</span>
-          </div>
-        </div>
-
-        <div class="profile-facts">
-          <div><span>Âge</span><strong id="age">16 ans</strong></div>
-          <div><span>Poste</span><strong>Attaquant</strong></div>
-          <div><span>Énergie</span><strong id="energy">100/100</strong></div>
-          <div><span>Confiance</span><strong id="confidence">50/100</strong></div>
-          <div><span>Statut</span><strong id="player-status">Remplaçant</strong></div>
-        </div>
-        <div class="progress"><div id="energy-bar" class="progress-fill"></div></div>
+    <section id="carriere" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">TON PROFIL</p><h2>Ma carrière</h2></div><span class="season-pill">Saison 1 · Fiction</span></div>
+      <div class="profile-grid">
+        <article class="panel player-card"><div class="avatar">⚽</div><div class="player-details"><label for="playerName">Nom du joueur</label><input id="playerName" maxlength="28" value="Alex Martin"><div class="profile-fields"><div><label for="playerPosition">Poste</label><select id="playerPosition"><option>Attaquant</option><option>Milieu</option><option>Ailier</option><option>Défenseur</option></select></div><div><label for="playerNumber">Numéro</label><input id="playerNumber" type="number" min="1" max="99" value="9"></div></div><label for="clubName">Club actuel (fictif)</label><input id="clubName" maxlength="35" value="FC Rivière Bleue"></div><button id="saveProfileBtn" class="button secondary full">Enregistrer le profil</button></article>
+        <article class="panel rating-card"><p class="eyebrow">NOTE GÉNÉRALE</p><div class="overall" id="overall">55</div><div class="rating-track"><span id="overallBar"></span></div><p id="playerStatus" class="muted">Jeune espoir · prêt à faire ses preuves</p><div class="skill-list"><div class="skill"><span>Finition</span><div class="skill-track"><span id="shootingBar"></span></div><b id="shootingValue">55</b></div><div class="skill"><span>Physique</span><div class="skill-track"><span id="physicalBar"></span></div><b id="physicalValue">55</b></div><div class="skill"><span>Collectif</span><div class="skill-track"><span id="teamworkBar"></span></div><b id="teamworkValue">55</b></div></div></article>
+        <article class="panel stats-card"><p class="eyebrow">STATISTIQUES DE SAISON</p><div class="stat-grid"><div><strong id="apps">0</strong><span>Matchs joués</span></div><div><strong id="starts">0</strong><span>Titularisations</span></div><div><strong id="goals">0</strong><span>Buts</span></div><div><strong id="assists">0</strong><span>Passes décisives</span></div><div><strong id="minutes">0</strong><span>Minutes</span></div><div><strong id="averageRating">—</strong><span>Note moyenne</span></div></div></article>
       </div>
     </section>
 
-    <section class="section" id="statistiques">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">SAISON EN COURS</span>
-          <h2>Statistiques personnelles</h2>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <article class="stat-card"><span>Matchs</span><strong id="matches">0</strong></article>
-        <article class="stat-card"><span>Titularisations</span><strong id="starts">0</strong></article>
-        <article class="stat-card"><span>Buts</span><strong id="goals">0</strong></article>
-        <article class="stat-card"><span>Passes décisives</span><strong id="assists">0</strong></article>
-        <article class="stat-card"><span>Minutes jouées</span><strong id="minutes">0</strong></article>
-        <article class="stat-card"><span>Note moyenne</span><strong id="average">—</strong></article>
-      </div>
+    <section id="match" class="section-block">
+      <div class="section-heading"><div><p class="eyebrow">LE JOUR DU MATCH</p><h2>Centre de match</h2></div><span id="matchStatus" class="status-pill">À préparer</span></div>
+      <article class="panel match-panel">
+        <div id="preMatch" class="pre-match"><div class="match-meta"><span id="matchRound">Journée 1</span><span id="matchVenue">À l'extérieur</span></div><div class="scoreboard"><div class="team"><div class="team-crest">🔵</div><strong id="homeTeam">FC Rivière Bleue</strong><small>DOMICILE</small></div><div class="score"><span>VS</span><small id="kickoff">Coup d'envoi à venir</small></div><div class="team"><div class="team-crest">🟠</div><strong id="awayTeam">AC Montclair</strong><small>EXTÉRIEUR</small></div></div><p id="opponentInfo" class="muted center">Prépare-toi pour la prochaine rencontre.</p><div class="lineup-choice"><p class="choice-title">Comment veux-tu débuter ?</p><div class="choice-buttons"><button class="button primary" id="startStarter">Être titulaire · 90 min</button><button class="button secondary" id="startSub">Commencer remplaçant · entrée possible</button></div></div></div>
+        <div id="liveMatch" class="live-match hidden"><div class="live-top"><span class="live-dot">● EN DIRECT</span><span id="matchMinute">1'</span></div><div class="live-score"><div><small id="liveHomeName">FC Rivière Bleue</small><strong id="homeScore">0</strong></div><span>—</span><div><small id="liveAwayName">AC Montclair</small><strong id="awayScore">0</strong></div></div><div class="match-progress"><span id="matchProgress"></span></div><div class="player-match-stats"><div><small>Ton temps de jeu</small><b id="liveMinutes">0 min</b></div><div><small>Ta note</small><b id="liveRating">6.0</b></div><div><small>Fatigue</small><b id="liveFatigue">0%</b></div></div><div id="eventCard" class="event-card"><p class="eyebrow">ACTION DU MATCH</p><h3 id="eventTitle">Le match va commencer</h3><p id="eventDescription">Reste concentré et choisis la meilleure option.</p></div><div id="actionChoices" class="action-choices"><button class="button action-button" data-action="shoot">⚽ Tenter ma chance</button><button class="button action-button" data-action="pass">↗ Faire une passe</button><button class="button action-button" data-action="dribble">✦ Provoquer en dribble</button><button class="button action-button" data-action="team">◎ Jouer collectif</button></div><div class="match-controls"><button id="advanceMatch" class="button primary">Continuer le match</button><button id="substituteMe" class="button secondary hidden">Demander à sortir</button></div><p id="actionFeedback" class="feedback" aria-live="polite"></p><div id="commentary" class="commentary" aria-live="polite"><p>Le vestiaire est prêt. À toi de jouer !</p></div></div>
+        <div id="postMatch" class="post-match hidden"><div class="final-whistle">🏁</div><p class="eyebrow">COUP DE SIFFLET FINAL</p><h3 id="finalHeadline">Fin du match</h3><div class="final-score"><strong id="finalHomeScore">0</strong><span>—</span><strong id="finalAwayScore">0</strong></div><p id="finalSummary" class="muted center"></p><div class="post-stats"><div><span>Temps de jeu</span><b id="finalMinutes">0 min</b></div><div><span>Note</span><b id="finalRating">6.0/10</b></div><div><span>Actions réussies</span><b id="finalActions">0</b></div></div><div id="matchHighlights" class="highlights"></div><button id="finishMatch" class="button primary full">Retour au calendrier</button></div>
+      </article>
     </section>
 
-    <section class="section" id="entrainement">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PROGRESSION</span>
-          <h2>Préparer le prochain match</h2>
-        </div>
-      </div>
-      <div class="cards three">
-        <article class="panel">
-          <h3>🎯 Finition</h3>
-          <p>Travaille tes tirs et augmente tes chances de marquer.</p>
-          <button class="button full" data-training="shooting">Faire la séance</button>
-        </article>
-        <article class="panel">
-          <h3>🏃 Physique</h3>
-          <p>Améliore tes capacités et ta note générale.</p>
-          <button class="button full" data-training="physical">Faire la séance</button>
-        </article>
-        <article class="panel">
-          <h3>😴 Récupération</h3>
-          <p>Récupère ton énergie avant la prochaine rencontre.</p>
-          <button class="button full" data-training="rest">Se reposer</button>
-        </article>
-      </div>
+    <section class="section-block two-columns">
+      <article class="panel training-panel"><div class="section-heading compact"><div><p class="eyebrow">PROGRESSION</p><h2>Entraînement</h2></div></div><p class="muted">Un entraînement améliore une compétence. Le repos réduit la fatigue entre les matchs.</p><div class="training-buttons"><button class="button secondary" data-training="shooting">⚽ Finition</button><button class="button secondary" data-training="physical">💪 Physique</button><button class="button secondary" data-training="teamwork">🤝 Collectif</button><button class="button secondary" data-training="rest">☕ Repos</button></div><p id="trainingMessage" class="feedback" aria-live="polite"></p></article>
+      <article class="panel next-panel"><p class="eyebrow">PROCHAIN OBJECTIF</p><h2 id="objectiveTitle">Gagner ta place</h2><p id="objectiveText" class="muted">Participe au prochain match et réalise de bonnes actions pour progresser.</p><div class="objective-track"><span id="objectiveBar"></span></div><small id="objectiveProgress">0 / 1 match joué</small><button id="resetGame" class="button danger full">Réinitialiser la carrière</button></article>
     </section>
 
-    <section class="section" id="matchs">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">CALENDRIER OFFICIEL DU JEU</span>
-          <h2>Calendrier du championnat</h2>
-        </div>
-        <span class="tag" id="round-label">Journée 1</span>
-      </div>
+    <section id="calendrier" class="section-block"><div class="section-heading"><div><p class="eyebrow">SAISON FICTIVE</p><h2>Calendrier</h2></div><span class="muted" id="fixtureCount">14 journées</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>Statut</th></tr></thead><tbody id="fixtureTable"></tbody></table></div></article></section>
 
-      <div class="panel">
-        <p class="muted">Choisis ton rôle avant chaque match. Les résultats de toutes les rencontres de la journée seront simulés ensemble.</p>
-        <label for="role-select">Mon rôle pour le prochain match</label>
-        <select id="role-select">
-          <option value="starter">Titulaire — environ 90 minutes</option>
-          <option value="sub">Remplaçant — entrée en jeu vers la 60e minute</option>
-        </select>
-        <div id="next-match" class="next-match"></div>
-        <button class="button" id="play-match">Jouer la prochaine journée</button>
-        <p class="feedback" id="match-feedback" aria-live="polite"></p>
-      </div>
+    <section id="classement" class="section-block"><div class="section-heading"><div><p class="eyebrow">OBJECTIF COLLECTIF</p><h2>Classement</h2></div><span class="fiction-note">Ligue fictive</span></div><article class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>#</th><th>Club</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Diff.</th><th>Pts</th></tr></thead><tbody id="standingsTable"></tbody></table></div></article></section>
 
-      <div class="panel table-panel">
-        <h3>Toutes les rencontres</h3>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>État</th></tr></thead>
-            <tbody id="fixtures-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="classement">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">COMPÉTITION FICTIVE</span>
-          <h2>Classement</h2>
-        </div>
-        <span class="tag">3 points par victoire</span>
-      </div>
-      <div class="panel table-panel">
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th><th>Club</th><th>J</th><th>G</th><th>N</th>
-                <th>P</th><th>BP</th><th>BC</th><th>Diff.</th><th>Pts</th>
-              </tr>
-            </thead>
-            <tbody id="standings-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="transferts">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">MARCHÉ DES TRANSFERTS</span>
-          <h2>Mon avenir</h2>
-        </div>
-      </div>
-      <div class="panel">
-        <p id="transfer-intro">Joue des matchs et progresse pour attirer l'attention d'autres clubs.</p>
-        <button class="button" id="check-transfers">Consulter les opportunités</button>
-        <div id="transfer-list" class="cards three transfer-list"></div>
-        <p class="muted">Les propositions sont fictives. Un transfert accepté change ton club de joueur, pas les résultats déjà enregistrés.</p>
-      </div>
-    </section>
-
-    <section class="section" id="decisions">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">TON HISTOIRE</span>
-          <h2>Décisions de carrière</h2>
-        </div>
-      </div>
-      <div class="cards three">
-        <button class="choice-card" data-choice="team">
-          <span>🤝</span><strong>Jouer collectif</strong>
-          <p>Favorise les passes et la confiance des coéquipiers.</p>
-        </button>
-        <button class="choice-card" data-choice="ambition">
-          <span>🎯</span><strong>Viser plus haut</strong>
-          <p>Choisis l'ambition et travaille pour devenir titulaire.</p>
-        </button>
-        <button class="choice-card" data-choice="coach">
-          <span>💬</span><strong>Écouter le coach</strong>
-          <p>Adopte une attitude sérieuse et régulière.</p>
-        </button>
-      </div>
-      <p class="feedback" id="choice-feedback" aria-live="polite">Tes décisions influencent ta progression.</p>
-    </section>
-
-    <section class="section" id="journal">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">LES ARCHIVES</span>
-          <h2>Journal de carrière</h2>
-        </div>
-      </div>
-      <div class="panel" id="story"></div>
-    </section>
-
-    <section class="section" id="sauvegarde">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PROGRESSION</span>
-          <h2>Sauvegarde</h2>
-        </div>
-      </div>
-      <div class="panel">
-        <p class="muted">Enregistre ta carrière sur cet appareil pour la reprendre plus tard.</p>
-        <div class="actions">
-          <button class="button" id="save-game">Sauvegarder</button>
-          <button class="button secondary" id="load-game">Charger</button>
-          <button class="button danger" id="reset-game">Nouvelle carrière</button>
-        </div>
-        <p class="feedback" id="save-feedback" aria-live="polite"></p>
-      </div>
-    </section>
+    <footer><span>⚽ Football Career</span><span>Prototype de jeu · Données fictives · Sauvegarde locale dans ce navigateur</span></footer>
   </main>
-
-  <footer>
-    <p>FC CAREER · Projet personnel de football interactif.</p>
-    <p>Clubs, calendrier et résultats fictifs. Aucune donnée sportive officielle.</p>
-  </footer>
+  <dialog id="confirmDialog" class="confirm-dialog"><form method="dialog"><h3>Réinitialiser la carrière ?</h3><p>Ta progression locale sera remplacée par une nouvelle carrière.</p><div class="choice-buttons"><button class="button secondary" value="cancel">Annuler</button><button id="confirmReset" class="button danger" value="confirm">Réinitialiser</button></div></form></dialog>
 </body>
 </html>
