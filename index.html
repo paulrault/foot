@@ -2,246 +2,241 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Découvre et fais évoluer la carrière de Lucas Morel, jeune footballeur fictif.">
-    <title>Football Career | Lucas Morel</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="Football Career : construis une carrière de footballeur interactive.">
+  <title>Football Career | Ma carrière</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-
-<header class="topbar">
+  <header class="topbar">
     <a class="logo" href="#accueil">FC <span>CAREER</span></a>
     <nav>
-        <a href="#accueil">Accueil</a>
-        <a href="#profil">Joueur</a>
-        <a href="#carriere">Carrière</a>
-        <a href="#statistiques">Statistiques</a>
+      <a href="#profil">Joueur</a>
+      <a href="#matchs">Matchs</a>
+      <a href="#classement">Classement</a>
+      <a href="#transferts">Transferts</a>
+      <a href="#journal">Histoire</a>
     </nav>
-</header>
+  </header>
 
-<main class="container">
-
+  <main class="container">
     <section class="hero" id="accueil">
-        <div class="hero-content">
-            <span class="eyebrow">MODE CARRIÈRE · SAISON 2026/2027</span>
-            <h1>Chaque match<br>écrit une histoire.</h1>
-            <p>
-                Prends les décisions, progresse sur le terrain
-                et construis la carrière de ton joueur.
-            </p>
-            <a class="button" href="#carriere">Continuer l'aventure →</a>
-        </div>
-        <div class="hero-number">09</div>
+      <span class="eyebrow">SAISON 2026–2027 · MODE CARRIÈRE</span>
+      <h1>Ta carrière.<br> Tes décisions. Ton histoire.</h1>
+      <p>Chaque entraînement, chaque match et chaque décision peuvent changer ton avenir.</p>
+      <a class="button" href="#matchs">Continuer la carrière ↓</a>
     </section>
 
     <section class="section" id="profil">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">TON JOUEUR</span>
-                <h2>Profil du joueur</h2>
-            </div>
-            <span class="status">● Carrière en cours</span>
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">IDENTITÉ</span>
+          <h2>Mon joueur</h2>
+        </div>
+        <span class="status" id="career-status">Carrière en cours</span>
+      </div>
+
+      <div class="panel">
+        <div class="profile-grid">
+          <div class="shirt">09</div>
+          <div>
+            <label for="player-name-input">Nom du joueur</label>
+            <input id="player-name-input" maxlength="40" value="Lucas Morel">
+            <label for="club-name-input">Club de départ</label>
+            <input id="club-name-input" maxlength="50" value="FC des Horizons">
+            <button class="button" id="apply-profile">Valider le profil</button>
+            <p class="muted">Le nom du club est personnalisable. Les équipes de ce championnat sont fictives.</p>
+          </div>
+          <div class="rating">
+            <span>NOTE GÉNÉRALE</span>
+            <strong id="overall">55</strong>
+            <span>/100</span>
+          </div>
         </div>
 
-        <div class="player-card">
-            <div class="player-number">09</div>
-            <div class="player-info">
-                <span class="eyebrow">ATTAQUANT · FRANCE</span>
-                <h2 id="player-name">Lucas Morel</h2>
-                <p>FC des Horizons <span class="fictional">(club fictif)</span></p>
-                <div class="player-details">
-                    <div>
-                        <span>Âge</span>
-                        <strong id="age">16 ans</strong>
-                    </div>
-                    <div>
-                        <span>Saison</span>
-                        <strong>2026/2027</strong>
-                    </div>
-                    <div>
-                        <span>Numéro</span>
-                        <strong>09</strong>
-                    </div>
-                </div>
-            </div>
-            <div class="overall">
-                <span>NOTE</span>
-                <strong id="overall">55</strong>
-                <span>/ 100</span>
-            </div>
+        <div class="profile-facts">
+          <div><span>Âge</span><strong id="age">16 ans</strong></div>
+          <div><span>Poste</span><strong>Attaquant</strong></div>
+          <div><span>Énergie</span><strong id="energy">100/100</strong></div>
+          <div><span>Confiance</span><strong id="confidence">50/100</strong></div>
+          <div><span>Statut</span><strong id="player-status">Remplaçant</strong></div>
         </div>
+        <div class="progress"><div id="energy-bar" class="progress-fill"></div></div>
+      </div>
     </section>
 
     <section class="section" id="statistiques">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">BILAN SPORTIF</span>
-                <h2>Statistiques de la saison</h2>
-            </div>
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">SAISON EN COURS</span>
+          <h2>Statistiques personnelles</h2>
         </div>
-
-        <div class="stats-grid">
-            <article class="stat-card">
-                <span>Matchs joués</span>
-                <strong id="matches">0</strong>
-            </article>
-            <article class="stat-card">
-                <span>Buts</span>
-                <strong id="goals">0</strong>
-            </article>
-            <article class="stat-card">
-                <span>Passes décisives</span>
-                <strong id="assists">0</strong>
-            </article>
-            <article class="stat-card">
-                <span>Confiance</span>
-                <strong id="confidence">50</strong>
-                <div class="progress">
-                    <div id="confidence-bar" class="progress-fill"></div>
-                </div>
-            </article>
-        </div>
+      </div>
+      <div class="stats-grid">
+        <article class="stat-card"><span>Matchs</span><strong id="matches">0</strong></article>
+        <article class="stat-card"><span>Titularisations</span><strong id="starts">0</strong></article>
+        <article class="stat-card"><span>Buts</span><strong id="goals">0</strong></article>
+        <article class="stat-card"><span>Passes décisives</span><strong id="assists">0</strong></article>
+        <article class="stat-card"><span>Minutes jouées</span><strong id="minutes">0</strong></article>
+        <article class="stat-card"><span>Note moyenne</span><strong id="average">—</strong></article>
+      </div>
     </section>
 
-    <section class="section" id="carriere">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">À TOI DE JOUER</span>
-                <h2>Gérer ma carrière</h2>
-            </div>
+    <section class="section" id="entrainement">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">PROGRESSION</span>
+          <h2>Préparer le prochain match</h2>
         </div>
-
-        <div class="career-grid">
-            <article class="panel">
-                <h3>🏋️ Entraînement</h3>
-                <p>
-                    Choisis une séance pour améliorer ton joueur.
-                    Chaque séance consomme de l'énergie.
-                </p>
-
-                <div class="energy-info">
-                    <span>Énergie disponible</span>
-                    <strong id="energy">100 / 100</strong>
-                </div>
-                <div class="progress">
-                    <div id="energy-bar" class="progress-fill"></div>
-                </div>
-
-                <button class="action-button" data-action="shooting">
-                    Travailler la finition <span>−25 énergie</span>
-                </button>
-                <button class="action-button" data-action="physical">
-                    Travailler le physique <span>−30 énergie</span>
-                </button>
-                <button class="action-button" data-action="rest">
-                    Se reposer <span>Récupération</span>
-                </button>
-            </article>
-
-            <article class="panel">
-                <h3>⚽ Prochain match</h3>
-                <span class="tag">CHAMPIONNAT FICTIF</span>
-                <div class="match">
-                    <div class="team">
-                        <div class="team-badge">FC</div>
-                        <strong>Horizons</strong>
-                    </div>
-                    <span class="versus">VS</span>
-                    <div class="team">
-                        <div class="team-badge opponent">AS</div>
-                        <strong>Collines</strong>
-                    </div>
-                </div>
-                <p>Objectif : aider ton équipe à obtenir un résultat positif.</p>
-                <button class="button full-width" id="play-match">
-                    Jouer le match
-                </button>
-                <p class="small-note">La rencontre est simulée par le jeu.</p>
-            </article>
-        </div>
+      </div>
+      <div class="cards three">
+        <article class="panel">
+          <h3>🎯 Finition</h3>
+          <p>Travaille tes tirs et augmente tes chances de marquer.</p>
+          <button class="button full" data-training="shooting">Faire la séance</button>
+        </article>
+        <article class="panel">
+          <h3>🏃 Physique</h3>
+          <p>Améliore tes capacités et ta note générale.</p>
+          <button class="button full" data-training="physical">Faire la séance</button>
+        </article>
+        <article class="panel">
+          <h3>😴 Récupération</h3>
+          <p>Récupère ton énergie avant la prochaine rencontre.</p>
+          <button class="button full" data-training="rest">Se reposer</button>
+        </article>
+      </div>
     </section>
 
-    <section class="section">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">LE FIL DE TON AVENTURE</span>
-                <h2>Journal de carrière</h2>
-            </div>
+    <section class="section" id="matchs">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">CALENDRIER OFFICIEL DU JEU</span>
+          <h2>Calendrier du championnat</h2>
         </div>
-        <div class="panel">
-            <div id="story">
-                <article class="story-entry">
-                    <span class="story-date">DÉBUT DE CARRIÈRE</span>
-                    <h3>Un rêve à construire</h3>
-                    <p>
-                        Lucas rejoint le FC des Horizons à 16 ans.
-                        Il veut progresser, gagner la confiance de
-                        son entraîneur et aider ses coéquipiers.
-                    </p>
-                </article>
-            </div>
+        <span class="tag" id="round-label">Journée 1</span>
+      </div>
+
+      <div class="panel">
+        <p class="muted">Choisis ton rôle avant chaque match. Les résultats de toutes les rencontres de la journée seront simulés ensemble.</p>
+        <label for="role-select">Mon rôle pour le prochain match</label>
+        <select id="role-select">
+          <option value="starter">Titulaire — environ 90 minutes</option>
+          <option value="sub">Remplaçant — entrée en jeu vers la 60e minute</option>
+        </select>
+        <div id="next-match" class="next-match"></div>
+        <button class="button" id="play-match">Jouer la prochaine journée</button>
+        <p class="feedback" id="match-feedback" aria-live="polite"></p>
+      </div>
+
+      <div class="panel table-panel">
+        <h3>Toutes les rencontres</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>J.</th><th>Rencontre</th><th>Score</th><th>État</th></tr></thead>
+            <tbody id="fixtures-body"></tbody>
+          </table>
         </div>
+      </div>
     </section>
 
-    <section class="section">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">TES DÉCISIONS</span>
-                <h2>Quel sera ton prochain choix ?</h2>
-            </div>
+    <section class="section" id="classement">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">COMPÉTITION FICTIVE</span>
+          <h2>Classement</h2>
         </div>
-
-        <div class="choices">
-            <button class="choice-card" data-choice="team">
-                <span>🤝</span>
-                <strong>Jouer collectif</strong>
-                <p>Privilégier les passes et l'esprit d'équipe.</p>
-            </button>
-            <button class="choice-card" data-choice="ambition">
-                <span>🎯</span>
-                <strong>Viser plus haut</strong>
-                <p>Se fixer des objectifs sportifs ambitieux.</p>
-            </button>
-            <button class="choice-card" data-choice="coach">
-                <span>💬</span>
-                <strong>Écouter le coach</strong>
-                <p>Travailler sérieusement pour progresser.</p>
-            </button>
+        <span class="tag">3 points par victoire</span>
+      </div>
+      <div class="panel table-panel">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Club</th><th>J</th><th>G</th><th>N</th>
+                <th>P</th><th>BP</th><th>BC</th><th>Diff.</th><th>Pts</th>
+              </tr>
+            </thead>
+            <tbody id="standings-body"></tbody>
+          </table>
         </div>
-        <p id="choice-feedback" class="feedback" aria-live="polite">
-            Choisis une option pour influencer ton histoire.
-        </p>
+      </div>
     </section>
 
-    <section class="section">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">SAUVEGARDE</span>
-                <h2>Ma progression</h2>
-            </div>
+    <section class="section" id="transferts">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">MARCHÉ DES TRANSFERTS</span>
+          <h2>Mon avenir</h2>
         </div>
-        <div class="panel save-panel">
-            <p>
-                Sauvegarde ta carrière dans ce navigateur pour
-                retrouver tes statistiques lors de ta prochaine visite.
-            </p>
-            <div class="save-actions">
-                <button class="button" id="save-game">Sauvegarder</button>
-                <button class="action-button" id="load-game">Charger</button>
-                <button class="action-button" id="reset-game">Nouvelle carrière</button>
-            </div>
-            <p id="save-feedback" class="small-note" aria-live="polite"></p>
-        </div>
+      </div>
+      <div class="panel">
+        <p id="transfer-intro">Joue des matchs et progresse pour attirer l'attention d'autres clubs.</p>
+        <button class="button" id="check-transfers">Consulter les opportunités</button>
+        <div id="transfer-list" class="cards three transfer-list"></div>
+        <p class="muted">Les propositions sont fictives. Un transfert accepté change ton club de joueur, pas les résultats déjà enregistrés.</p>
+      </div>
     </section>
 
-</main>
+    <section class="section" id="decisions">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">TON HISTOIRE</span>
+          <h2>Décisions de carrière</h2>
+        </div>
+      </div>
+      <div class="cards three">
+        <button class="choice-card" data-choice="team">
+          <span>🤝</span><strong>Jouer collectif</strong>
+          <p>Favorise les passes et la confiance des coéquipiers.</p>
+        </button>
+        <button class="choice-card" data-choice="ambition">
+          <span>🎯</span><strong>Viser plus haut</strong>
+          <p>Choisis l'ambition et travaille pour devenir titulaire.</p>
+        </button>
+        <button class="choice-card" data-choice="coach">
+          <span>💬</span><strong>Écouter le coach</strong>
+          <p>Adopte une attitude sérieuse et régulière.</p>
+        </button>
+      </div>
+      <p class="feedback" id="choice-feedback" aria-live="polite">Tes décisions influencent ta progression.</p>
+    </section>
 
-<footer>
-    <p>FC CAREER · Une carrière fictive à écrire.</p>
-    <p>Projet personnel réalisé avec HTML, CSS et JavaScript.</p>
-</footer>
+    <section class="section" id="journal">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">LES ARCHIVES</span>
+          <h2>Journal de carrière</h2>
+        </div>
+      </div>
+      <div class="panel" id="story"></div>
+    </section>
 
+    <section class="section" id="sauvegarde">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">PROGRESSION</span>
+          <h2>Sauvegarde</h2>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="muted">Enregistre ta carrière sur cet appareil pour la reprendre plus tard.</p>
+        <div class="actions">
+          <button class="button" id="save-game">Sauvegarder</button>
+          <button class="button secondary" id="load-game">Charger</button>
+          <button class="button danger" id="reset-game">Nouvelle carrière</button>
+        </div>
+        <p class="feedback" id="save-feedback" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>FC CAREER · Projet personnel de football interactif.</p>
+    <p>Clubs, calendrier et résultats fictifs. Aucune donnée sportive officielle.</p>
+  </footer>
 </body>
 </html>
